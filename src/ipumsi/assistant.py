@@ -15,11 +15,9 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from dataclasses import dataclass, field
-from pathlib import Path
 
-from .config import ROOT
+from .credentials import MissingKey, get_key
 
 log = logging.getLogger(__name__)
 
@@ -104,12 +102,12 @@ SCHEMA = {
 }
 
 
-class MissingAnthropicKey(RuntimeError):
-    pass
-
-
 class AssistantError(RuntimeError):
     pass
+
+
+# Kept as an alias so the page can catch one exception type for either key.
+MissingAnthropicKey = MissingKey
 
 
 @dataclass
@@ -133,29 +131,8 @@ class Suggestion:
 
 
 def anthropic_key(explicit: str | None = None) -> str:
-    """Resolve the Anthropic API key. Same search order as the IPUMS key."""
-    if explicit:
-        return explicit.strip()
-    if os.environ.get("ANTHROPIC_API_KEY"):
-        return os.environ["ANTHROPIC_API_KEY"].strip()
-
-    dotenv = ROOT / ".env"
-    if dotenv.exists():
-        for line in dotenv.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if line.startswith("ANTHROPIC_API_KEY="):
-                value = line.split("=", 1)[1].strip().strip("'\"")
-                if value and not value.startswith("your_"):
-                    return value
-
-    keyfile = Path.home() / ".anthropic_api_key"
-    if keyfile.exists() and keyfile.read_text(encoding="utf-8").strip():
-        return keyfile.read_text(encoding="utf-8").strip()
-
-    raise MissingAnthropicKey(
-        "No Anthropic API key found. Set ANTHROPIC_API_KEY, add it to .env, or "
-        "write it to ~/.anthropic_api_key. Keys: https://console.anthropic.com/"
-    )
+    """Resolve the Anthropic API key. See :mod:`ipumsi.credentials`."""
+    return get_key("ANTHROPIC_API_KEY", explicit)
 
 
 def catalog_prompt(catalog) -> str:
@@ -173,6 +150,42 @@ def catalog_prompt(catalog) -> str:
         f"(use these exact names in `countries`):\n{countries}\n\n"
         f"=== VARIABLE CATALOG ({len(lines)} variables) ===\n" + "\n".join(lines)
     )
+
+
+def _is_unsupported_beta(exc: Exception) -> bool:
+    """True when the failure is about the fallbacks beta rather than the request."""
+    if isinstance(exc, TypeError):  # older SDK: no `fallbacks` / `betas` kwarg
+        return True
+    if getattr(exc, "status_code", None) != 400:
+        return False
+    text = str(exc).lower()
+    return "fallback" in text or "beta" in text
+
+
+def _friendly(exc: Exception) -> AssistantError:
+    """Turn the SDK's exception into something a researcher can act on."""
+    text = str(exc)
+    lowered = text.lower()
+    if "credit balance is too low" in lowered or "billing" in lowered:
+        return AssistantError(
+            "This Anthropic key is valid but the account has no credit. Add credit at "
+            "https://console.anthropic.com/settings/billing — then try again. "
+            "Everything else in this app works without it."
+        )
+    if isinstance(exc, getattr(_anthropic(), "AuthenticationError", ())):
+        return AssistantError(
+            "Anthropic rejected this key. Check it at "
+            "https://console.anthropic.com/settings/keys"
+        )
+    if isinstance(exc, getattr(_anthropic(), "RateLimitError", ())):
+        return AssistantError("Rate limited by Anthropic. Wait a moment and try again.")
+    return AssistantError(text)
+
+
+def _anthropic():
+    import anthropic
+
+    return anthropic
 
 
 def _client(key: str | None = None):
@@ -221,9 +234,17 @@ def suggest_variables(
         response = client.beta.messages.create(
             betas=[FALLBACK_BETA], fallbacks="default", **request
         )
-    except Exception as exc:  # noqa: BLE001 - beta may be unavailable on this key
+    except Exception as exc:  # noqa: BLE001 - inspected below
+        # Retry plainly only when the *beta parameter* is what was rejected.
+        # Auth, billing and rate-limit failures must propagate: retrying those
+        # just burns a second request and buries the real message.
+        if not _is_unsupported_beta(exc):
+            raise _friendly(exc) from exc
         log.info("server-side fallbacks unavailable (%s); retrying without", exc)
-        response = client.messages.create(**request)
+        try:
+            response = client.messages.create(**request)
+        except Exception as inner:  # noqa: BLE001
+            raise _friendly(inner) from inner
 
     if response.stop_reason == "refusal":
         category = getattr(getattr(response, "stop_details", None), "category", None)

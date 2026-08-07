@@ -36,38 +36,18 @@ USER_AGENT = (
 )
 
 
-class MissingAPIKey(RuntimeError):
-    pass
-
-
 def api_key(explicit: str | None = None) -> str:
-    """Resolve the IPUMS API key.
+    """Resolve the IPUMS API key. See :mod:`ipumsi.credentials` for the search order."""
+    from .credentials import get_key
 
-    Order: explicit argument, ``IPUMS_API_KEY`` env var, a ``.env`` file at the
-    repo root, then ``~/.ipums_api_key``.
-    """
-    if explicit:
-        return explicit.strip()
+    return get_key("IPUMS_API_KEY", explicit)
 
-    if os.environ.get("IPUMS_API_KEY"):
-        return os.environ["IPUMS_API_KEY"].strip()
 
-    dotenv = ROOT / ".env"
-    if dotenv.exists():
-        for line in dotenv.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if line.startswith("IPUMS_API_KEY="):
-                value = line.split("=", 1)[1].strip().strip("'\"")
-                if value and value != "your_key_here":
-                    return value
+def __getattr__(name: str):
+    # `MissingAPIKey` moved to ipumsi.credentials.MissingKey; keep the old name
+    # importable so existing code and notebooks don't break.
+    if name == "MissingAPIKey":
+        from .credentials import MissingKey
 
-    keyfile = Path.home() / ".ipums_api_key"
-    if keyfile.exists():
-        value = keyfile.read_text(encoding="utf-8").strip()
-        if value:
-            return value
-
-    raise MissingAPIKey(
-        "No IPUMS API key found. Set IPUMS_API_KEY, copy .env.example to .env, "
-        "or write the key to ~/.ipums_api_key. Keys: https://account.ipums.org/api_keys"
-    )
+        return MissingKey
+    raise AttributeError(name)

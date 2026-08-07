@@ -1,12 +1,9 @@
 import streamlit as st
 
+from app_keys import key_for, require_key
 from app_shared import OPTIONAL, REQUIRED, catalog, init_state, tier_summary
-from ipumsi.assistant import (
-    AssistantError,
-    MissingAnthropicKey,
-    anthropic_key,
-    suggest_variables,
-)
+from ipumsi.assistant import AssistantError, suggest_variables
+from ipumsi.credentials import MissingKey
 
 cat = catalog()
 init_state()
@@ -47,40 +44,33 @@ pitch = st.text_area(
     placeholder="e.g. I want to map internal migration flows and relate them to income…",
 )
 
-try:
-    anthropic_key()
-    has_key = True
-    key_error = ""
-except MissingAnthropicKey as exc:
-    has_key = False
-    key_error = str(exc)
-
 with st.container(horizontal=True):
     go = st.button(
         "Suggest variables",
         type="primary",
         icon=":material/auto_awesome:",
-        disabled=not (has_key and pitch.strip()),
+        disabled=not pitch.strip(),
     )
     if st.session_state.get("suggestion"):
         if st.button("Clear", icon=":material/close:"):
             st.session_state.pop("suggestion", None)
             st.rerun()
 
-if not has_key:
-    st.info(key_error)
-    st.caption(
-        "The catalog is sent as a cached prompt, so the first question costs a few "
-        "cents and later ones are roughly a tenth of that."
-    )
-
 if go:
-    try:
-        st.session_state["suggestion"] = suggest_variables(cat, pitch)
-    except (AssistantError, MissingAnthropicKey) as exc:
-        st.error(str(exc))
-    except Exception as exc:  # noqa: BLE001 - surface the API's message verbatim
-        st.error(f"Request failed: {exc}")
+    # Only ask for a key once the user has actually asked for something.
+    key = require_key("ANTHROPIC_API_KEY", "Suggesting variables")
+    if key:
+        try:
+            st.session_state["suggestion"] = suggest_variables(cat, pitch, api_key=key)
+        except (AssistantError, MissingKey) as exc:
+            st.error(str(exc))
+        except Exception as exc:  # noqa: BLE001 - surface the API's message verbatim
+            st.error(f"Request failed: {exc}")
+    else:
+        st.caption(
+            "The catalog is sent as a cached prompt, so the first question costs a few "
+            "cents and later ones are roughly a tenth of that."
+        )
 
 suggestion = st.session_state.get("suggestion")
 if not suggestion:

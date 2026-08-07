@@ -5,8 +5,10 @@ import threading
 
 import streamlit as st
 
+from app_keys import key_status_panel
 from app_shared import catalog, clear_catalog_cache
 from ipumsi import config
+from ipumsi.credentials import CREDENTIALS_FILE
 from ipumsi.scrape.build import build_catalog
 
 cat = catalog(required=False)
@@ -128,12 +130,27 @@ with st.expander("Or refresh from the command line"):
         "not depend on this page staying open."
     )
 
-st.subheader("API key")
-try:
-    config.api_key()
-    st.success("An IPUMS API key is configured; extract submission is enabled.")
-except config.MissingAPIKey as exc:
-    st.info(str(exc))
+st.subheader("API keys")
+st.caption(
+    "Neither key is needed to browse the catalog — they are only used when you "
+    "submit an extract or ask Claude for suggestions."
+)
+for key_name in ("IPUMS_API_KEY", "ANTHROPIC_API_KEY"):
+    key_status_panel(key_name)
+
+with st.expander("Other ways to set a key"):
+    st.markdown(
+        f"""The app looks in this order, and uses the first it finds:
+
+1. a key you typed in this session
+2. `.streamlit/secrets.toml` (for deployed apps)
+3. the `IPUMS_API_KEY` / `ANTHROPIC_API_KEY` environment variables
+4. a `.env` file in the project folder (copy `.env.example` to `.env`)
+5. `{CREDENTIALS_FILE}` — what the buttons above write
+
+Keys are never written into the project folder, so they cannot be committed
+by accident."""
+    )
 
 st.subheader("Current selection")
 required = st.session_state.get("required_vars", [])

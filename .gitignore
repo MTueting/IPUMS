@@ -21,3 +21,6 @@ extracts/
 *.dat.gz
 *.csv.gz
 *.xml
+
+# Streamlit deployment secrets (never commit)
+.streamlit/secrets.toml

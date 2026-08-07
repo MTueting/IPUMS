@@ -2,8 +2,8 @@ import json
 
 import streamlit as st
 
+from app_keys import require_key, resume_after_key
 from app_shared import catalog, sample_filters, tier_summary, variable_pickers
-from ipumsi.config import MissingAPIKey, api_key
 from ipumsi.extract import ExtractDefinition
 
 cat = catalog()
@@ -122,32 +122,18 @@ with st.container(horizontal=True):
         icon=":material/download:",
     )
 
-    try:
-        api_key()
-        has_key = True
-    except MissingAPIKey:
-        has_key = False
+    submit = st.button("Submit to IPUMS", type="primary", icon=":material/send:")
 
-    submit = st.button(
-        "Submit to IPUMS",
-        type="primary",
-        icon=":material/send:",
-        disabled=not has_key,
-        help=None if has_key else "Set IPUMS_API_KEY to enable submission",
-    )
-
-if not has_key:
-    st.caption(
-        "No API key found. Set `IPUMS_API_KEY`, or copy `.env.example` to `.env`. "
-        "Keys: https://account.ipums.org/api_keys"
-    )
-
-if submit:
+if submit or resume_after_key("IPUMS_API_KEY"):
     from ipumsi.api import IpumsClient
+
+    key = require_key("IPUMS_API_KEY", "Submitting an extract")
+    if not key:
+        st.stop()
 
     with st.spinner("Submitting…"):
         try:
-            result = IpumsClient().submit(definition)
+            result = IpumsClient(key=key).submit(definition)
         except Exception as exc:  # noqa: BLE001 - surface the API's message verbatim
             st.error(f"Submission failed: {exc}")
         else:

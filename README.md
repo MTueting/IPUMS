@@ -162,17 +162,55 @@ The scraper makes one request at a time with a ~0.34 s delay and caches every pa
 to `.cache/`, so a re-run after a failure is nearly free. IPUMS updates its
 harmonised samples a few times a year; re-running quarterly is plenty.
 
-## API key
+## API keys
 
-Only needed for `submit` / `status` / `download` — all catalog queries work
-offline. Get one at <https://account.ipums.org/api_keys> (requires an approved
-IPUMS International account), then either:
+**Nothing in the catalog needs a key.** Search, availability, coverage and case
+counts all work offline. Keys are only used for:
+
+| Key | Used for | Get one |
+|---|---|---|
+| `IPUMS_API_KEY` | Submitting extracts and downloading data | <https://account.ipums.org/api_keys> (needs an approved IPUMS International account) |
+| `ANTHROPIC_API_KEY` | The optional "Ask Claude" page | <https://console.anthropic.com/settings/keys> |
+
+### Easiest: let the app ask
+
+Just use the app. The first time you press **Submit to IPUMS** or **Suggest
+variables**, it offers a box to paste the key into, checks it against the live
+API, and offers to remember it. You can also manage both keys up front on the
+**Settings** page.
+
+### From the terminal
 
 ```bash
-export IPUMS_API_KEY=...            # env var
-cp .env.example .env                # or a .env at the repo root
-echo "$KEY" > ~/.ipums_api_key      # or a dotfile
+ipumsi key set IPUMS_API_KEY      # prompts without echoing, verifies, saves
+ipumsi key list                   # which keys are set, and where they came from
+ipumsi key check IPUMS_API_KEY    # verify against the live API
+ipumsi key forget IPUMS_API_KEY   # delete a saved key
 ```
+
+### Where keys are looked for
+
+First match wins:
+
+1. a key typed into the app this session (never written to disk)
+2. `.streamlit/secrets.toml` — for deployed apps
+3. the `IPUMS_API_KEY` / `ANTHROPIC_API_KEY` environment variables
+4. a `.env` file in the project folder (`cp .env.example .env`)
+5. `~/.ipumsi/credentials.json` — what the app and `ipumsi key set` write
+
+Saved keys go to your **home folder, never the project folder**, so they cannot
+be committed by accident. `.env` is gitignored for the same reason.
+
+### If you are sharing this app with other people
+
+Two things to know:
+
+- A key saved through the app is saved on **the machine running the app**. If
+  you serve it to colleagues, whoever opens it can use that key. The dialog
+  detects a non-localhost connection, defaults to session-only, and warns you.
+- For a real deployment, use `.streamlit/secrets.toml` (gitignored) or
+  environment variables, and have each user bring their own key via the
+  session-only option.
 
 Extract requests support case selection, attached characteristics, data-quality
 flags, monetary-value adjustment and hierarchical output; IPUMS International
@@ -189,6 +227,7 @@ src/ipumsi/
   cli.py          the `ipumsi` command
   http.py         cached, rate-limited scraping session
   countries.py    sample prefix -> ISO 3166 alpha-2/alpha-3
+  credentials.py  where API keys live, and checking they work
   assistant.py    optional: pitch -> variable picks, via Claude
   scrape/
     samples.py       the sample-ID table
@@ -197,6 +236,7 @@ src/ipumsi/
     frequencies.py   per-category case counts (on demand)
     build.py         orchestration; writes data/
 streamlit_app.py + app_pages/    the explorer
+app_keys.py                      in-app key entry dialog
 tests/                           parser + query tests
 ```
 

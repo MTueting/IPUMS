@@ -1,5 +1,7 @@
 """Command-line interface: ``ipumsi <command>``.
 
+    ipumsi key set IPUMS_API_KEY            save a key (prompts without echo)
+    ipumsi key list                         which keys are set, and from where
     ipumsi refresh                          rebuild the catalog from the website
     ipumsi search migration                 find variables
     ipumsi info GEOMIG1_P                   one variable, with availability
@@ -71,6 +73,55 @@ def cmd_refresh(args) -> None:
     for name, df in frames.items():
         print(f"{name:20s} {len(df):>8,d} rows")
     print(f"\nwritten to {config.DATA_DIR}")
+
+
+def cmd_key(args) -> None:
+    from .credentials import (
+        CREDENTIALS_FILE, SPECS, delete_key, find_key, mask, save_key, verify_key,
+    )
+
+    if args.key_command == "list":
+        rows = []
+        for name, spec in SPECS.items():
+            key, source = find_key(name)
+            rows.append({
+                "key": name,
+                "status": mask(key) if key else "not set",
+                "source": source,
+                "used for": spec.what_it_unlocks,
+            })
+        _print(pd.DataFrame(rows), None, args.csv)
+        print(f"\nSaved keys live in {CREDENTIALS_FILE}", file=sys.stderr)
+        return
+
+    name = args.name
+    if name not in SPECS:
+        raise SystemExit(f"unknown key {name!r}; expected one of {', '.join(SPECS)}")
+
+    if args.key_command == "check":
+        key, source = find_key(name)
+        if not key:
+            raise SystemExit(f"{name} is not set")
+        ok, message = verify_key(name, key)
+        print(f"{name} (from {source}): {message}")
+        raise SystemExit(0 if ok else 1)
+
+    if args.key_command == "forget":
+        print(f"removed {name}" if delete_key(name) else f"{name} was not saved here")
+        return
+
+    # set
+    import getpass
+
+    value = args.value or getpass.getpass(f"Paste your {SPECS[name].label} (input hidden): ")
+    if not value.strip():
+        raise SystemExit("no key given")
+    if not args.no_check:
+        ok, message = verify_key(name, value)
+        print(message, file=sys.stderr)
+        if not ok:
+            raise SystemExit(1)
+    print(f"saved to {save_key(name, value)}")
 
 
 def cmd_search(args) -> None:
@@ -295,6 +346,23 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--delay", type=float, default=None, help="seconds between requests")
     p.add_argument("--limit-variables", type=int, default=None, help="for smoke tests")
     p.set_defaults(func=cmd_refresh)
+
+    p = sub.add_parser("key", help="manage the IPUMS and Anthropic API keys")
+    sub_key = p.add_subparsers(dest="key_command", required=True)
+    kp = sub_key.add_parser("list", help="show which keys are set and where they came from")
+    kp.add_argument("--csv", action="store_true")
+    kp.set_defaults(func=cmd_key, csv=False)
+    kp = sub_key.add_parser("set", help="save a key for this user")
+    kp.add_argument("name", help="IPUMS_API_KEY or ANTHROPIC_API_KEY")
+    kp.add_argument("value", nargs="?", help="omit to be prompted without echo")
+    kp.add_argument("--no-check", action="store_true", help="skip the live API check")
+    kp.set_defaults(func=cmd_key, csv=False)
+    kp = sub_key.add_parser("check", help="verify a key against the live API")
+    kp.add_argument("name")
+    kp.set_defaults(func=cmd_key, csv=False)
+    kp = sub_key.add_parser("forget", help="delete a saved key")
+    kp.add_argument("name")
+    kp.set_defaults(func=cmd_key, csv=False)
 
     p = sub.add_parser("search", help="search variables by mnemonic, label or description")
     p.add_argument("query", nargs="+")
