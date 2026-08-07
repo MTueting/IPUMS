@@ -132,6 +132,29 @@ class Catalog:
         )
         return wide.sort_index()
 
+    def _filter_samples(
+        self,
+        df: pd.DataFrame,
+        countries: list[str] | None = None,
+        year_min: int | None = None,
+        year_max: int | None = None,
+        kind: str | None = None,
+    ) -> pd.DataFrame:
+        if countries:
+            wanted = {c.strip().lower() for c in countries}
+            df = df[
+                df["country"].str.lower().isin(wanted)
+                | df["iso3"].fillna("").str.lower().isin(wanted)
+                | df["iso2"].fillna("").str.lower().isin(wanted)
+            ]
+        if year_min is not None:
+            df = df[df["year"] >= year_min]
+        if year_max is not None:
+            df = df[df["year"] <= year_max]
+        if kind:
+            df = df[df["kind"] == kind]
+        return df
+
     def samples_with(
         self,
         variables: list[str],
@@ -160,21 +183,53 @@ class Catalog:
             lambda s: ";".join(sorted(set(wanted) - set(pairs.loc[pairs["sample_id"] == s, "variable"])))
         )
 
-        if countries:
-            wanted_countries = {c.strip().lower() for c in countries}
-            out = out[
-                out["country"].str.lower().isin(wanted_countries)
-                | out["iso3"].fillna("").str.lower().isin(wanted_countries)
-                | out["iso2"].fillna("").str.lower().isin(wanted_countries)
-            ]
-        if year_min is not None:
-            out = out[out["year"] >= year_min]
-        if year_max is not None:
-            out = out[out["year"] <= year_max]
-        if kind:
-            out = out[out["kind"] == kind]
-
+        out = self._filter_samples(out, countries, year_min, year_max, kind)
         return out.sort_values(["country", "year", "sample_id"]).reset_index(drop=True)
+
+    def samples_for(
+        self,
+        required: list[str],
+        optional: list[str] | None = None,
+        countries: list[str] | None = None,
+        year_min: int | None = None,
+        year_max: int | None = None,
+        kind: str | None = None,
+    ) -> pd.DataFrame:
+        """Samples carrying every ``required`` variable, scored on ``optional`` ones.
+
+        This is the shape most analyses actually have: a core set you cannot do
+        without, and a wish list that buys extra controls where it happens to
+        exist. Only ``required`` filters the sample set; ``optional`` variables
+        are reported per sample so you can see what each country-year would
+        additionally give you.
+        """
+        required = self.resolve_variables(required or [])
+        optional = [v for v in self.resolve_variables(optional or []) if v not in required]
+        if not required and not optional:
+            raise ValueError("give at least one required or optional variable")
+
+        if required:
+            out = self.samples_with(
+                required, how="all", countries=countries,
+                year_min=year_min, year_max=year_max, kind=kind,
+            )
+        else:
+            out = self._filter_samples(
+                self.samples.copy(), countries, year_min, year_max, kind
+            ).sort_values(["country", "year", "sample_id"]).reset_index(drop=True)
+            out["n_variables_present"] = 0
+            out["missing_variables"] = ""
+
+        pairs = self.variable_samples[self.variable_samples["variable"].isin(optional)]
+        by_sample = pairs.groupby("sample_id")["variable"].agg(set).to_dict()
+        have = out["sample_id"].map(lambda s: by_sample.get(s, set()))
+
+        out["n_required"] = len(required)
+        out["n_optional"] = len(optional)
+        out["n_optional_present"] = have.map(len)
+        out["optional_present"] = have.map(lambda s: ";".join(sorted(s)))
+        out["optional_missing"] = have.map(lambda s: ";".join(sorted(set(optional) - s)))
+        return out
 
     def coverage(self, variables: list[str], how: str = "all") -> pd.DataFrame:
         """One row per country: how many samples satisfy the variable set, and which years."""

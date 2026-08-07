@@ -138,3 +138,71 @@ def test_roundtrip_through_json(tmp_path):
     path = original.save(tmp_path / "req.json")
     restored = ExtractDefinition.from_json(path)
     assert restored.to_json() == original.to_json()
+
+
+# ---------------------------------------------------------- must / nice tiers
+
+
+def test_samples_for_scores_optional_without_filtering(catalog):
+    out = catalog.samples_for(["GEOMIG1_P"], ["INCTOT"])
+    # INCTOT never removes a sample; GEOMIG1_P alone decides the set.
+    assert list(out["sample_id"]) == ["br2000a", "br2010a", "mx2010a"]
+    scored = out.set_index("sample_id")
+    assert scored.loc["br2010a", "n_optional_present"] == 1
+    assert scored.loc["br2010a", "optional_missing"] == ""
+    assert scored.loc["br2000a", "n_optional_present"] == 0
+    assert scored.loc["br2000a", "optional_missing"] == "INCTOT"
+
+
+def test_samples_for_required_still_filters(catalog):
+    out = catalog.samples_for(["GEOMIG1_P", "INCTOT"], [])
+    assert list(out["sample_id"]) == ["br2010a"]
+
+
+def test_samples_for_deduplicates_across_tiers(catalog):
+    out = catalog.samples_for(["GEOMIG1_P"], ["GEOMIG1_P", "INCTOT"])
+    assert out["n_optional"].iloc[0] == 1  # GEOMIG1_P dropped from optional
+
+
+def test_samples_for_with_no_required_keeps_every_sample(catalog):
+    out = catalog.samples_for([], ["INCTOT"])
+    assert len(out) == len(catalog.samples)
+    assert out.set_index("sample_id").loc["br2010a", "n_optional_present"] == 1
+
+
+def test_samples_for_applies_filters(catalog):
+    out = catalog.samples_for(["GEOMIG1_P"], ["INCTOT"], year_min=2005)
+    assert set(out["sample_id"]) == {"br2010a", "mx2010a"}
+
+
+def test_samples_for_needs_something(catalog):
+    with pytest.raises(ValueError, match="at least one"):
+        catalog.samples_for([], [])
+
+
+def test_build_extract_includes_optional_but_does_not_filter_on_them(catalog):
+    definition = build_extract(catalog, ["GEOMIG1_P"], optional=["INCTOT"])
+    assert definition.samples == ["br2000a", "br2010a", "mx2010a"]
+    assert definition.variables == ["GEOMIG1_P", "INCTOT"]
+
+
+def test_validate_is_lenient_about_optional(catalog):
+    definition = build_extract(catalog, ["GEOMIG1_P"], optional=["INCTOT"])
+    # INCTOT is genuinely missing from two samples...
+    assert any("INCTOT" in p for p in definition.validate(catalog))
+    # ...but that was the point of marking it optional.
+    assert definition.validate(catalog, optional=["INCTOT"]) == []
+
+
+def test_validate_never_excuses_a_required_variable(catalog):
+    definition = ExtractDefinition(samples=["br2000a", "br2010a"], variables=["INCTOT"])
+    assert definition.validate(catalog, optional=["GEOMIG1_P"]) != []
+
+
+def test_coverage_report_counts_blanks(catalog):
+    definition = build_extract(catalog, ["GEOMIG1_P"], optional=["INCTOT"])
+    report = definition.coverage_report(catalog).set_index("variable")
+    assert report.loc["GEOMIG1_P", "samples_missing"] == 0
+    assert report.loc["INCTOT", "samples_missing"] == 2
+    assert report.loc["INCTOT", "missing_in"] == "br2000a;mx2010a"
+    assert report.loc["GEOMIG1_P", "share"] == 1.0

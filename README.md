@@ -24,6 +24,7 @@ country-years you actually have.
 ```bash
 pip install -e .            # core
 pip install -e ".[app]"     # + Streamlit explorer
+pip install -e ".[assistant]" # + the "Ask Claude" page
 pip install -e ".[dev]"     # + pytest
 ```
 
@@ -37,6 +38,9 @@ ipumsi search migration --record-type P
 
 # One variable, and every country-year it covers
 ipumsi info GEOMIG1_P
+
+# Is it actually populated? (availability != usable data)
+ipumsi codes GEOMIG1_P --sample br2010a --nonzero
 
 # Where do I have BOTH internal-migration origin and income?
 ipumsi coverage GEOMIG1_P INCTOT
@@ -74,13 +78,54 @@ On Windows, double-click **`Start app.bat`** instead. Double-clicking
 `streamlit_app.py` will not work: Streamlit apps are web servers and have to be
 started through the `streamlit run` launcher, not by executing the script.
 
-Three pages: **Browse** (search variables, see a country × year availability
-heatmap), **Coverage** (pick a variable set, see which country-years carry all of
-it and which variable is the binding constraint), **Build extract** (assemble,
-validate, download the JSON or submit it).
+Five pages:
+
+- **Ask Claude** — describe the project in prose; Claude reads the whole catalog
+  and proposes a must-have / nice-to-have split that lands in every other page.
+- **Browse** — search variables, see a country × year availability heatmap, and
+  profile a variable's **case counts** per category for up to three samples.
+- **Coverage** — pick a variable set, see which country-years carry all of it and
+  which variable is the binding constraint.
+- **Build extract** — assemble, validate, download the JSON or submit it.
+- **Settings** — catalog stats and a one-click refresh with live progress.
 
 A worked end-to-end example — internal migration by income, including what each
 income measure costs in coverage — is in `examples/internal_migration.py`.
+
+## Must-have vs nice-to-have
+
+Most analyses have a core set you cannot do without and a wish list that buys
+extra controls where it happens to exist. Only the must-haves filter the sample
+set; nice-to-haves are scored per sample so you can see what each country-year
+would additionally give you:
+
+```bash
+# GEOMIG1_P + GEOLEV1 decide the panel; income and education are a bonus
+ipumsi samples GEOMIG1_P GEOLEV1 --optional INCTOT EDATTAIN
+ipumsi plan GEOMIG1_P GEOLEV1 --optional INCTOT EDATTAIN -o request.json
+```
+
+Moving one variable between tiers is usually the difference between 13 samples
+and 130 — the Coverage page shows the trade-off directly.
+
+## Case counts
+
+Availability says a variable *exists* in a sample. It does not say the variable
+is *populated*: `GEOMIG1_P` is available in Brazil 2010 and 85% of its cases sit
+in "Unknown". The Browse page fetches the per-category counts IPUMS publishes
+(from the same JSON endpoint its own "Case-count view" uses) and flags that
+before the variable ends up in an extract.
+
+These are pulled on demand rather than committed — one variable can be 100k+
+category × sample cells, which would dwarf the rest of the catalog.
+
+## Ask Claude
+
+Optional. `pip install -e ".[assistant]"` and set `ANTHROPIC_API_KEY`. The whole
+variable catalog (~32k tokens) is sent as a *cached* prompt and the reply is
+constrained to a JSON schema, so every mnemonic that comes back is checked
+against the catalog before it reaches the UI — a hallucinated variable is
+dropped and reported, never silently selected.
 
 ## The one thing worth knowing
 
@@ -100,6 +145,8 @@ tells you exactly which variable × sample pairs would come back empty.
 | `data/availability.parquet` | ~350k | the raw `(variable, country, token)` scrape, pre-resolution |
 | `data/countries.csv` | ~101 | country → ISO2/ISO3 (the join key for World Bank data) |
 | `data/catalog_meta.json` | — | scrape timestamp and row counts |
+
+Case counts are deliberately *not* in this table — see "Case counts" above.
 
 `country_prefix` in `samples.csv` is ISO 3166-1 alpha-2 with one exception (`uk`,
 not `gb`); `iso3` is already normalised for World Bank joins.
@@ -142,10 +189,12 @@ src/ipumsi/
   cli.py          the `ipumsi` command
   http.py         cached, rate-limited scraping session
   countries.py    sample prefix -> ISO 3166 alpha-2/alpha-3
+  assistant.py    optional: pitch -> variable picks, via Claude
   scrape/
     samples.py       the sample-ID table
     variables.py     the 29 variable groups, paginated
     availability.py  per-variable country/year lists -> sample IDs
+    frequencies.py   per-category case counts (on demand)
     build.py         orchestration; writes data/
 streamlit_app.py + app_pages/    the explorer
 tests/                           parser + query tests

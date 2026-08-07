@@ -2,7 +2,7 @@ import json
 
 import streamlit as st
 
-from app_shared import catalog, sample_filters, variable_picker
+from app_shared import catalog, sample_filters, tier_summary, variable_pickers
 from ipumsi.config import MissingAPIKey, api_key
 from ipumsi.extract import ExtractDefinition
 
@@ -13,37 +13,48 @@ st.write(
     "then download the JSON or submit it directly."
 )
 
-variables = variable_picker(cat, key="selected_variables")
-if not variables:
-    st.info("Pick the variables you want in the extract.")
+required, optional = variable_pickers(cat, page="extract")
+if not required and not optional:
+    st.info("Pick the variables you want. Anything selected on Browse or Coverage is already here.")
     st.stop()
+tier_summary(required, optional)
 
 filters = sample_filters(cat, prefix="ext")
 
 with st.container(horizontal=True):
-    require = st.segmented_control(
-        "Include samples carrying",
-        ["all variables", "any variable"],
-        default="all variables",
-    )
     data_format = st.selectbox("Data format", ["csv", "fixed_width", "stata", "spss", "sas9"])
     structure = st.segmented_control(
         "Structure", ["Rectangular (person)", "Hierarchical"], default="Rectangular (person)"
     )
 
-how = "all" if require in (None, "all variables") else "any"
-candidates = cat.samples_with(variables, how=how, **filters)
-
+candidates = cat.samples_for(required, optional, **filters)
 if candidates.empty:
-    st.warning("No samples match. Loosen the filters or drop a variable.")
+    st.warning("No sample carries every must-have variable. Loosen the filters or move one to nice-to-have.")
     st.stop()
 
 st.subheader(f"{len(candidates)} candidate samples")
+if optional:
+    st.caption(
+        "Every candidate satisfies all must-haves. The number in brackets is how many "
+        "nice-to-haves that sample adds."
+    )
+    extras = dict(zip(candidates["sample_id"], candidates["n_optional_present"]))
+else:
+    extras = {}
+
+descriptions = dict(zip(candidates["sample_id"], candidates["description"]))
+
+
+def _label(sample: str) -> str:
+    base = f"{sample} — {descriptions.get(sample, '')}"
+    return f"{base}  [+{extras[sample]}/{len(optional)}]" if extras else base
+
+
 chosen = st.multiselect(
     "Samples to include",
     candidates["sample_id"].tolist(),
     default=candidates["sample_id"].tolist(),
-    format_func=lambda s: f"{s} — {candidates.loc[candidates.sample_id == s, 'description'].iloc[0]}",
+    format_func=_label,
 )
 if not chosen:
     st.warning("Select at least one sample.")
@@ -51,19 +62,21 @@ if not chosen:
 
 description = st.text_input(
     "Extract description",
-    value=f"ipumsi: {', '.join(variables[:4])}" + (" …" if len(variables) > 4 else ""),
+    value=f"ipumsi: {', '.join(required[:4])}" + (" …" if len(required) > 4 else ""),
 )
 
 definition = ExtractDefinition(
     samples=chosen,
-    variables=variables,
+    variables=required + optional,
     description=description,
     data_format=data_format,
     hierarchical=(structure == "Hierarchical"),
     rectangular_on=None if structure == "Hierarchical" else "P",
 )
 
-problems = definition.validate(cat)
+# Nice-to-haves are expected to be patchy -- that was the point of the tier -- so
+# only must-haves count as validation problems.
+problems = definition.validate(cat, optional=optional)
 if problems:
     st.warning(
         "This request asks for combinations IPUMS does not harmonise — those columns "
@@ -71,7 +84,25 @@ if problems:
         + "\n".join(f"- {p}" for p in problems)
     )
 else:
-    st.success("Every variable is available in every selected sample.")
+    st.success("Every must-have variable is available in every selected sample.")
+
+report = definition.coverage_report(cat)
+patchy = report[report["samples_missing"] > 0]
+if not patchy.empty:
+    with st.expander(f"{len(patchy)} variable(s) will be blank in some samples"):
+        st.caption("Expected for nice-to-haves; worth a look if a must-have shows up here.")
+        st.dataframe(
+            patchy[["variable", "samples_present", "samples_missing", "share"]],
+            hide_index=True,
+            column_config={
+                "variable": st.column_config.TextColumn("Variable"),
+                "samples_present": st.column_config.NumberColumn("Present in", width="small"),
+                "samples_missing": st.column_config.NumberColumn("Blank in", width="small"),
+                "share": st.column_config.ProgressColumn(
+                    "Coverage", min_value=0.0, max_value=1.0, format="percent"
+                ),
+            },
+        )
 
 payload = definition.to_json()
 request_json = json.dumps(payload, indent=2)

@@ -3,6 +3,7 @@
     ipumsi refresh                          rebuild the catalog from the website
     ipumsi search migration                 find variables
     ipumsi info GEOMIG1_P                   one variable, with availability
+    ipumsi codes EDATTAIN --sample br2010a  case counts per category
     ipumsi coverage GEOMIG1_P INCTOT        country-years carrying all of them
     ipumsi samples GEOMIG1_P INCTOT         the sample IDs themselves
     ipumsi plan GEOMIG1_P INCTOT -o req.json    write an extract request
@@ -37,6 +38,15 @@ def _print(df: pd.DataFrame, limit: int | None = 50, csv: bool = False) -> None:
         print(shown.to_string(index=False))
     if limit is not None and len(df) > limit:
         print(f"... {len(df) - limit} more rows (use --limit 0 for all, --csv to pipe)")
+
+
+def _filters(args) -> dict:
+    return {
+        "countries": args.country,
+        "year_min": args.year_min,
+        "year_max": args.year_max,
+        "kind": args.kind,
+    }
 
 
 def _catalog() -> Catalog:
@@ -90,26 +100,67 @@ def cmd_info(args) -> None:
 
 def cmd_coverage(args) -> None:
     cat = _catalog()
-    df = cat.coverage(args.variables, how=args.require)
-    print(f"# samples carrying {args.require} of: {', '.join(cat.resolve_variables(args.variables))}\n")
+    if args.optional:
+        usable = cat.samples_for(args.variables, args.optional, **_filters(args))
+        df = (
+            usable.groupby(["country", "iso3"], dropna=False, as_index=False)
+            .agg(
+                n_samples=("sample_id", "size"),
+                years=("year", lambda s: ", ".join(str(y) for y in sorted(set(s.dropna())))),
+                avg_extras=("n_optional_present", "mean"),
+            )
+            .sort_values(["n_samples", "country"], ascending=[False, True])
+            .reset_index(drop=True)
+        )
+        print(f"# must have:     {', '.join(cat.resolve_variables(args.variables))}")
+        print(f"# nice to have:  {', '.join(cat.resolve_variables(args.optional))}\n")
+    else:
+        df = cat.coverage(args.variables, how=args.require)
+        print(
+            f"# samples carrying {args.require} of: "
+            f"{', '.join(cat.resolve_variables(args.variables))}\n"
+        )
     _print(df, args.limit or None, args.csv)
 
 
 def cmd_samples(args) -> None:
     cat = _catalog()
-    df = cat.samples_with(
-        args.variables,
-        how=args.require,
-        countries=args.country,
-        year_min=args.year_min,
-        year_max=args.year_max,
-        kind=args.kind,
-    )
+    if args.optional:
+        df = cat.samples_for(args.variables, args.optional, **_filters(args))
+    else:
+        df = cat.samples_with(args.variables, how=args.require, **_filters(args))
     if args.ids_only:
         print(" ".join(df["sample_id"]))
         return
-    columns = ["sample_id", "country", "iso3", "year", "kind", "subsample", "n_variables_present"]
+    columns = ["sample_id", "country", "iso3", "year", "kind", "subsample",
+               "n_variables_present", "n_optional_present", "optional_missing"]
     _print(df[[c for c in columns if c in df.columns]], args.limit or None, args.csv)
+
+
+def cmd_codes(args) -> None:
+    from .http import Fetcher
+    from .scrape.frequencies import fetch_frequencies
+
+    cat = _catalog()
+    row = cat.variable(args.variable)
+    df = fetch_frequencies(Fetcher(), row["variable"], refresh=args.refresh)
+    if df.empty:
+        print(f"IPUMS publishes no case counts for {row['variable']}")
+        return
+
+    if args.sample:
+        wanted = {s.strip().lower() for s in args.sample}
+        unknown = wanted - set(df["sample_id"])
+        if unknown:
+            print(f"# not available for: {', '.join(sorted(unknown))}", file=sys.stderr)
+        df = df[df["sample_id"].isin(wanted)]
+    if args.nonzero:
+        df = df[df["count"] > 0]
+
+    print(f"# {row['variable']}: {row['label']}")
+    print(f"# {df['sample_id'].nunique()} sample(s), {df['code'].nunique()} categories\n")
+    df = df.sort_values(["sample_id", "count"], ascending=[True, False])
+    _print(df[["sample_id", "code", "label", "count", "share"]], args.limit or None, args.csv)
 
 
 def cmd_matrix(args) -> None:
@@ -128,6 +179,7 @@ def cmd_plan(args) -> None:
     definition = build_extract(
         cat,
         variables=args.variables,
+        optional=args.optional,
         countries=args.country,
         year_min=args.year_min,
         year_max=args.year_max,
@@ -137,7 +189,7 @@ def cmd_plan(args) -> None:
         data_format=args.format,
         hierarchical=args.hierarchical,
     )
-    problems = definition.validate(cat)
+    problems = definition.validate(cat, optional=args.optional)
     payload = definition.to_json()
     print(
         f"# {len(payload['samples'])} samples x {len(payload['variables'])} variables",
@@ -207,6 +259,13 @@ def cmd_download(args) -> None:
 
 
 def _add_filters(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--optional",
+        nargs="+",
+        default=[],
+        metavar="VAR",
+        help="nice-to-have variables: included where they exist, never rule a sample out",
+    )
     parser.add_argument("--country", action="append", help="country name or ISO code (repeatable)")
     parser.add_argument("--year-min", type=int)
     parser.add_argument("--year-max", type=int)
@@ -260,6 +319,14 @@ def build_parser() -> argparse.ArgumentParser:
     _add_filters(p)
     _add_output(p)
     p.set_defaults(func=cmd_samples)
+
+    p = sub.add_parser("codes", help="case counts per category for one variable")
+    p.add_argument("variable")
+    p.add_argument("--sample", nargs="+", help="restrict to these sample IDs")
+    p.add_argument("--nonzero", action="store_true", help="hide categories with no cases")
+    p.add_argument("--refresh", action="store_true", help="bypass the page cache")
+    _add_output(p)
+    p.set_defaults(func=cmd_codes)
 
     p = sub.add_parser("matrix", help="sample x variable availability matrix")
     p.add_argument("variables", nargs="+")

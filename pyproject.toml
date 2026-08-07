@@ -19,6 +19,7 @@ dependencies = [
 
 [project.optional-dependencies]
 app = ["streamlit>=1.30", "altair>=5"]
+assistant = ["anthropic>=0.70"]
 dev = ["pytest>=7"]
 
 [project.scripts]

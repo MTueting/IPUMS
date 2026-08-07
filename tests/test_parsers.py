@@ -140,3 +140,62 @@ def test_resolve_samples_maps_every_token_shape():
         "1851b": "uk1851b",    # letter token -> that exact suffix
         "1911": "uk1911a",     # bare year -> the plain census
     }
+
+
+# ------------------------------------------------------- case-count frequencies
+
+CODE_DATA_HTML = """
+<script type="text/javascript">
+  var codeData = {
+    jsonPath: "/international-action/frequencies/SEX",
+    samples: [{"name":"br2010a","id":2408},{"name":"mx2010a","id":2409}],
+    categories: [
+      {"id":100,"label":"Male","indent":0,"code":"1","general":true},
+      {"id":101,"label":"Female {sic}","indent":0,"code":"2","general":true},
+      {"id":102,"label":"Unknown","indent":1,"code":"9","general":false}
+    ]
+  };
+  CODES.initializeCodeData(codeData);
+</script>
+"""
+
+FREQ_PAYLOAD = {
+    "2408": {"100": {"count": 40, "availability": "X"},
+             "101": {"count": 60, "availability": "X"},
+             "102": {"count": 0, "availability": "."}},
+    "2409": {"100": {"count": 25, "availability": "X"},
+             "101": {"count": 75, "availability": "X"}},
+    "9999": {"100": {"count": 1, "availability": "X"}},  # unknown sample -> dropped
+}
+
+
+def test_parse_code_data():
+    from ipumsi.scrape.frequencies import parse_code_data
+
+    samples, categories = parse_code_data(CODE_DATA_HTML)
+    assert samples == {2408: "br2010a", 2409: "mx2010a"}
+    # A brace inside a category label must not terminate the object scan.
+    assert [c["label"] for c in categories] == ["Male", "Female {sic}", "Unknown"]
+    assert categories[0]["general"] is True
+
+
+def test_parse_frequencies_shares_and_joins():
+    from ipumsi.scrape.frequencies import parse_code_data, parse_frequencies
+
+    samples, categories = parse_code_data(CODE_DATA_HTML)
+    df = parse_frequencies(FREQ_PAYLOAD, samples, categories, "SEX")
+
+    assert set(df["sample_id"]) == {"br2010a", "mx2010a"}  # id 9999 dropped
+    brazil = df[df["sample_id"] == "br2010a"].set_index("code")
+    assert brazil.loc["2", "count"] == 60
+    assert brazil.loc["2", "share"] == pytest.approx(0.6)
+    assert not brazil.loc["9", "available"]
+    # Shares are within-sample, so each sample sums to 1.
+    assert df.groupby("sample_id")["share"].sum().round(6).eq(1.0).all()
+
+
+def test_parse_code_data_rejects_a_changed_page():
+    from ipumsi.scrape.frequencies import parse_code_data
+
+    with pytest.raises(ValueError, match="no codeData"):
+        parse_code_data("<html><body>nothing here</body></html>")

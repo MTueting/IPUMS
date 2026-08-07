@@ -148,15 +148,20 @@ class ExtractDefinition:
 
     # ------------------------------------------------------------- validation
 
-    def validate(self, catalog) -> list[str]:
+    def validate(self, catalog, optional: list[str] | tuple[str, ...] = ()) -> list[str]:
         """Check the request against the scraped catalog.
 
         Returns a list of human-readable problems: unknown samples or variables,
         and variable/sample combinations IPUMS does not harmonise. Requesting an
         unavailable combination is not an API error -- the columns come back all
         missing -- so catching it here is the point of having the catalog.
+
+        Variables named in ``optional`` are expected to be patchy and are skipped:
+        they were chosen as nice-to-have, so their absence is a known cost rather
+        than a mistake. Use :meth:`coverage_report` to see what that cost is.
         """
         problems: list[str] = []
+        lenient = {v.strip().upper() for v in optional}
 
         known_samples = set(catalog.samples["sample_id"])
         unknown_samples = [s for s in self.samples if s.lower() not in known_samples]
@@ -172,7 +177,7 @@ class ExtractDefinition:
         pairs = catalog.variable_samples
         valid_samples = [s.lower() for s in self.samples if s.lower() in known_samples]
         for var in names:
-            if var in unknown_vars:
+            if var in unknown_vars or var in lenient:
                 continue
             have = set(pairs.loc[pairs["variable"] == var, "sample_id"])
             missing = [s for s in valid_samples if s not in have]
@@ -184,10 +189,36 @@ class ExtractDefinition:
                 )
         return problems
 
+    def coverage_report(self, catalog) -> "pd.DataFrame":
+        """Per-variable: how many of the requested samples actually carry it."""
+        import pandas as pd
+
+        pairs = catalog.variable_samples
+        known = set(catalog.samples["sample_id"])
+        samples = [s.lower() for s in self.samples if s.lower() in known]
+        rows = []
+        for spec in self._variable_specs():
+            var = spec.name.upper()
+            have = set(pairs.loc[pairs["variable"] == var, "sample_id"])
+            present = [s for s in samples if s in have]
+            rows.append(
+                {
+                    "variable": var,
+                    "samples_present": len(present),
+                    "samples_missing": len(samples) - len(present),
+                    "share": len(present) / len(samples) if samples else 0.0,
+                    "missing_in": ";".join(sorted(set(samples) - have)),
+                }
+            )
+        return pd.DataFrame(rows).sort_values(
+            ["samples_missing", "variable"]
+        ).reset_index(drop=True)
+
 
 def build_extract(
     catalog,
     variables: list[str],
+    optional: list[str] | None = None,
     countries: list[str] | None = None,
     year_min: int | None = None,
     year_max: int | None = None,
@@ -200,25 +231,31 @@ def build_extract(
     """Build an extract over every sample that satisfies a variable requirement.
 
     This is the shortcut from a research question to a request: name the
-    variables, optionally restrict the country-years, and get back a definition
-    covering exactly the samples where the variable set holds.
+    must-have ``variables``, add any ``optional`` ones you want wherever they
+    exist, optionally restrict the country-years, and get back a definition
+    covering exactly the samples where the must-haves hold.
     """
-    hits = catalog.samples_with(
-        variables,
-        how=require,
-        countries=countries,
-        year_min=year_min,
-        year_max=year_max,
-        kind=kind,
-    )
+    required = catalog.resolve_variables(variables)
+    extras = [v for v in catalog.resolve_variables(optional or []) if v not in required]
+
+    if optional:
+        hits = catalog.samples_for(
+            required, extras, countries=countries,
+            year_min=year_min, year_max=year_max, kind=kind,
+        )
+    else:
+        hits = catalog.samples_with(
+            required, how=require, countries=countries,
+            year_min=year_min, year_max=year_max, kind=kind,
+        )
     if hits.empty:
         raise ValueError(
-            f"no samples carry {require} of {variables} under the given filters"
+            f"no samples carry {require} of {required} under the given filters"
         )
     return ExtractDefinition(
         samples=hits["sample_id"].tolist(),
-        variables=catalog.resolve_variables(variables),
-        description=description or f"ipumsi: {', '.join(catalog.resolve_variables(variables))}",
+        variables=required + extras,
+        description=description or f"ipumsi: {', '.join(required)}",
         data_format=data_format,
         **kwargs,
     )
