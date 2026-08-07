@@ -1,0 +1,9 @@
+{
+  "scraped_at": "2026-08-07T12:40:19+00:00",
+  "n_samples": 655,
+  "n_variables": 1709,
+  "n_countries": 104,
+  "n_availability_rows": 62485,
+  "n_variable_sample_pairs": 62485,
+  "source": "https://international.ipums.org (public browse pages)"
+}

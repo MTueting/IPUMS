@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+
+# Secrets
+.env
+*.apikey
+
+# Scrape cache (regenerable; can be large)
+.cache/
+
+# Downloaded IPUMS extracts (large, and redistribution is restricted)
+extracts/
+*.dat.gz
+*.csv.gz
+*.xml

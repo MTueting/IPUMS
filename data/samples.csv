@@ -1,0 +1,656 @@
+sample_id,country,iso2,iso3,country_prefix,year,year_end,quarter,kind,subsample,sample_suffix,description
+am2001a,Armenia,AM,ARM,am,2001,,,census,,a,Armenia 2001
+am2011a,Armenia,AM,ARM,am,2011,,,census,,a,Armenia 2011
+ar1970a,Argentina,AR,ARG,ar,1970,,,census,,a,Argentina 1970
+ar1980a,Argentina,AR,ARG,ar,1980,,,census,,a,Argentina 1980
+ar1991a,Argentina,AR,ARG,ar,1991,,,census,,a,Argentina 1991
+ar2001a,Argentina,AR,ARG,ar,2001,,,census,,a,Argentina 2001
+ar2010a,Argentina,AR,ARG,ar,2010,,,census,,a,Argentina 2010
+at1971a,Austria,AT,AUT,at,1971,,,census,,a,Austria 1971
+at1981a,Austria,AT,AUT,at,1981,,,census,,a,Austria 1981
+at1991a,Austria,AT,AUT,at,1991,,,census,,a,Austria 1991
+at2001a,Austria,AT,AUT,at,2001,,,census,,a,Austria 2001
+at2011a,Austria,AT,AUT,at,2011,,,census,,a,Austria 2011
+bd1991a,Bangladesh,BD,BGD,bd,1991,,,census,,a,Bangladesh 1991
+bd2001a,Bangladesh,BD,BGD,bd,2001,,,census,,a,Bangladesh 2001
+bd2011a,Bangladesh,BD,BGD,bd,2011,,,census,,a,Bangladesh 2011
+bf1985a,Burkina Faso,BF,BFA,bf,1985,,,census,,a,Burkina Faso 1985
+bf1996a,Burkina Faso,BF,BFA,bf,1996,,,census,,a,Burkina Faso 1996
+bf2006a,Burkina Faso,BF,BFA,bf,2006,,,census,,a,Burkina Faso 2006
+bj1979a,Benin,BJ,BEN,bj,1979,,,census,,a,Benin 1979
+bj1992a,Benin,BJ,BEN,bj,1992,,,census,,a,Benin 1992
+bj2002a,Benin,BJ,BEN,bj,2002,,,census,,a,Benin 2002
+bj2013a,Benin,BJ,BEN,bj,2013,,,census,,a,Benin 2013
+bo1976a,Bolivia,BO,BOL,bo,1976,,,census,,a,Bolivia 1976
+bo1992a,Bolivia,BO,BOL,bo,1992,,,census,,a,Bolivia 1992
+bo2001a,Bolivia,BO,BOL,bo,2001,,,census,,a,Bolivia 2001
+bo2012a,Bolivia,BO,BOL,bo,2012,,,census,,a,Bolivia 2012
+br1960a,Brazil,BR,BRA,br,1960,,,census,,a,Brazil 1960
+br1970a,Brazil,BR,BRA,br,1970,,,census,,a,Brazil 1970
+br1980a,Brazil,BR,BRA,br,1980,,,census,,a,Brazil 1980
+br1991a,Brazil,BR,BRA,br,1991,,,census,,a,Brazil 1991
+br2000a,Brazil,BR,BRA,br,2000,,,census,,a,Brazil 2000
+br2010a,Brazil,BR,BRA,br,2010,,,census,,a,Brazil 2010
+bw1981a,Botswana,BW,BWA,bw,1981,,,census,,a,Botswana 1981
+bw1991a,Botswana,BW,BWA,bw,1991,,,census,,a,Botswana 1991
+bw2001a,Botswana,BW,BWA,bw,2001,,,census,,a,Botswana 2001
+bw2011a,Botswana,BW,BWA,bw,2011,,,census,,a,Botswana 2011
+by1999a,Belarus,BY,BLR,by,1999,,,census,,a,Belarus 1999
+by2009a,Belarus,BY,BLR,by,2009,,,census,,a,Belarus 2009
+ca1852a,Canada,CA,CAN,ca,1852,,,census,,a,Canada 1852
+ca1871a,Canada,CA,CAN,ca,1871,,,census,,a,Canada 1871
+ca1881a,Canada,CA,CAN,ca,1881,,,census,,a,Canada 1881
+ca1891a,Canada,CA,CAN,ca,1891,,,census,,a,Canada 1891
+ca1901a,Canada,CA,CAN,ca,1901,,,census,,a,Canada 1901
+ca1911a,Canada,CA,CAN,ca,1911,,,census,,a,Canada 1911
+ca1971a,Canada,CA,CAN,ca,1971,,,census,,a,Canada 1971
+ca1981a,Canada,CA,CAN,ca,1981,,,census,,a,Canada 1981
+ca1991a,Canada,CA,CAN,ca,1991,,,census,,a,Canada 1991
+ca2001a,Canada,CA,CAN,ca,2001,,,census,,a,Canada 2001
+ca2011a,Canada,CA,CAN,ca,2011,,,census,,a,Canada 2011
+ch1970a,Switzerland,CH,CHE,ch,1970,,,census,,a,Switzerland 1970
+ch1980a,Switzerland,CH,CHE,ch,1980,,,census,,a,Switzerland 1980
+ch1990a,Switzerland,CH,CHE,ch,1990,,,census,,a,Switzerland 1990
+ch2000a,Switzerland,CH,CHE,ch,2000,,,census,,a,Switzerland 2000
+ch2011a,Switzerland,CH,CHE,ch,2011,,,census,,a,Switzerland 2011
+ci1988a,Côte d'Ivoire,CI,CIV,ci,1988,,,census,,a,Côte d'Ivoire 1988
+ci1998a,Côte d'Ivoire,CI,CIV,ci,1998,,,census,,a,Côte d'Ivoire 1998
+cl1960a,Chile,CL,CHL,cl,1960,,,census,,a,Chile 1960
+cl1970a,Chile,CL,CHL,cl,1970,,,census,,a,Chile 1970
+cl1982a,Chile,CL,CHL,cl,1982,,,census,,a,Chile 1982
+cl1992a,Chile,CL,CHL,cl,1992,,,census,,a,Chile 1992
+cl2002a,Chile,CL,CHL,cl,2002,,,census,,a,Chile 2002
+cl2017a,Chile,CL,CHL,cl,2017,,,census,,a,Chile 2017
+cm1976a,Cameroon,CM,CMR,cm,1976,,,census,,a,Cameroon 1976
+cm1987a,Cameroon,CM,CMR,cm,1987,,,census,,a,Cameroon 1987
+cm2005a,Cameroon,CM,CMR,cm,2005,,,census,,a,Cameroon 2005
+cn1982a,China,CN,CHN,cn,1982,,,census,,a,China 1982
+cn1990a,China,CN,CHN,cn,1990,,,census,,a,China 1990
+cn2000a,China,CN,CHN,cn,2000,,,census,,a,China 2000
+co1964a,Colombia,CO,COL,co,1964,,,census,,a,Colombia 1964
+co1973a,Colombia,CO,COL,co,1973,,,census,,a,Colombia 1973
+co1985a,Colombia,CO,COL,co,1985,,,census,,a,Colombia 1985
+co1993a,Colombia,CO,COL,co,1993,,,census,,a,Colombia 1993
+co2005a,Colombia,CO,COL,co,2005,,,census,,a,Colombia 2005
+cr1963a,Costa Rica,CR,CRI,cr,1963,,,census,,a,Costa Rica 1963
+cr1973a,Costa Rica,CR,CRI,cr,1973,,,census,,a,Costa Rica 1973
+cr1984a,Costa Rica,CR,CRI,cr,1984,,,census,,a,Costa Rica 1984
+cr2000a,Costa Rica,CR,CRI,cr,2000,,,census,,a,Costa Rica 2000
+cr2011a,Costa Rica,CR,CRI,cr,2011,,,census,,a,Costa Rica 2011
+cu2002a,Cuba,CU,CUB,cu,2002,,,census,,a,Cuba 2002
+cu2012a,Cuba,CU,CUB,cu,2012,,,census,,a,Cuba 2012
+de1819a,Germany,DE,DEU,de,1819,,,census,Mecklenburg-Schwerin,a,Germany [Mecklenburg-Schwerin] 1819
+de1970a,Germany,DE,DEU,de,1970,,,census,,a,Germany 1970
+de1971a,Germany,DE,DEU,de,1971,,,census,,a,Germany 1971
+de1981a,Germany,DE,DEU,de,1981,,,census,,a,Germany 1981
+de1987a,Germany,DE,DEU,de,1987,,,census,,a,Germany 1987
+dk1787a,Denmark,DK,DNK,dk,1787,,,census,,a,Denmark 1787
+dk1801a,Denmark,DK,DNK,dk,1801,,,census,,a,Denmark 1801
+dk1845a,Denmark,DK,DNK,dk,1845,,,census,,a,Denmark 1845
+dk1880a,Denmark,DK,DNK,dk,1880,,,census,,a,Denmark 1880
+dk1885a,Denmark,DK,DNK,dk,1885,,,census,,a,Denmark 1885
+do1960a,Dominican Republic,DO,DOM,do,1960,,,census,,a,Dominican Rep 1960
+do1970a,Dominican Republic,DO,DOM,do,1970,,,census,,a,Dominican Rep 1970
+do1981a,Dominican Republic,DO,DOM,do,1981,,,census,,a,Dominican Rep 1981
+do2002a,Dominican Republic,DO,DOM,do,2002,,,census,,a,Dominican Rep 2002
+do2010a,Dominican Republic,DO,DOM,do,2010,,,census,,a,Dominican Rep 2010
+ec1962a,Ecuador,EC,ECU,ec,1962,,,census,,a,Ecuador 1962
+ec1974a,Ecuador,EC,ECU,ec,1974,,,census,,a,Ecuador 1974
+ec1982a,Ecuador,EC,ECU,ec,1982,,,census,,a,Ecuador 1982
+ec1990a,Ecuador,EC,ECU,ec,1990,,,census,,a,Ecuador 1990
+ec2001a,Ecuador,EC,ECU,ec,2001,,,census,,a,Ecuador 2001
+ec2010a,Ecuador,EC,ECU,ec,2010,,,census,,a,Ecuador 2010
+eg1848a,Egypt,EG,EGY,eg,1848,,,census,,a,Egypt 1848
+eg1868a,Egypt,EG,EGY,eg,1868,,,census,,a,Egypt 1868
+eg1986a,Egypt,EG,EGY,eg,1986,,,census,,a,Egypt 1986
+eg1996a,Egypt,EG,EGY,eg,1996,,,census,,a,Egypt 1996
+eg2006a,Egypt,EG,EGY,eg,2006,,,census,,a,Egypt 2006
+es1981a,Spain,ES,ESP,es,1981,,,census,,a,Spain 1981
+es1991a,Spain,ES,ESP,es,1991,,,census,,a,Spain 1991
+es2001a,Spain,ES,ESP,es,2001,,,census,,a,Spain 2001
+es2005h,Spain,ES,ESP,es,2005,,1,LFS,,h,Spain 2005 Q1 LFS
+es2005i,Spain,ES,ESP,es,2005,,2,LFS,,i,Spain 2005 Q2 LFS
+es2005j,Spain,ES,ESP,es,2005,,3,LFS,,j,Spain 2005 Q3 LFS
+es2005k,Spain,ES,ESP,es,2005,,4,LFS,,k,Spain 2005 Q4 LFS
+es2006h,Spain,ES,ESP,es,2006,,1,LFS,,h,Spain 2006 Q1 LFS
+es2006i,Spain,ES,ESP,es,2006,,2,LFS,,i,Spain 2006 Q2 LFS
+es2006j,Spain,ES,ESP,es,2006,,3,LFS,,j,Spain 2006 Q3 LFS
+es2006k,Spain,ES,ESP,es,2006,,4,LFS,,k,Spain 2006 Q4 LFS
+es2007h,Spain,ES,ESP,es,2007,,1,LFS,,h,Spain 2007 Q1 LFS
+es2007i,Spain,ES,ESP,es,2007,,2,LFS,,i,Spain 2007 Q2 LFS
+es2007j,Spain,ES,ESP,es,2007,,3,LFS,,j,Spain 2007 Q3 LFS
+es2007k,Spain,ES,ESP,es,2007,,4,LFS,,k,Spain 2007 Q4 LFS
+es2008h,Spain,ES,ESP,es,2008,,1,LFS,,h,Spain 2008 Q1 LFS
+es2008i,Spain,ES,ESP,es,2008,,2,LFS,,i,Spain 2008 Q2 LFS
+es2008j,Spain,ES,ESP,es,2008,,3,LFS,,j,Spain 2008 Q3 LFS
+es2008k,Spain,ES,ESP,es,2008,,4,LFS,,k,Spain 2008 Q4 LFS
+es2009h,Spain,ES,ESP,es,2009,,1,LFS,,h,Spain 2009 Q1 LFS
+es2009i,Spain,ES,ESP,es,2009,,2,LFS,,i,Spain 2009 Q2 LFS
+es2009j,Spain,ES,ESP,es,2009,,3,LFS,,j,Spain 2009 Q3 LFS
+es2009k,Spain,ES,ESP,es,2009,,4,LFS,,k,Spain 2009 Q4 LFS
+es2010h,Spain,ES,ESP,es,2010,,1,LFS,,h,Spain 2010 Q1 LFS
+es2010i,Spain,ES,ESP,es,2010,,2,LFS,,i,Spain 2010 Q2 LFS
+es2010j,Spain,ES,ESP,es,2010,,3,LFS,,j,Spain 2010 Q3 LFS
+es2010k,Spain,ES,ESP,es,2010,,4,LFS,,k,Spain 2010 Q4 LFS
+es2011a,Spain,ES,ESP,es,2011,,,census,,a,Spain 2011
+es2011h,Spain,ES,ESP,es,2011,,1,LFS,,h,Spain 2011 Q1 LFS
+es2011i,Spain,ES,ESP,es,2011,,2,LFS,,i,Spain 2011 Q2 LFS
+es2011j,Spain,ES,ESP,es,2011,,3,LFS,,j,Spain 2011 Q3 LFS
+es2011k,Spain,ES,ESP,es,2011,,4,LFS,,k,Spain 2011 Q4 LFS
+es2012h,Spain,ES,ESP,es,2012,,1,LFS,,h,Spain 2012 Q1 LFS
+es2012i,Spain,ES,ESP,es,2012,,2,LFS,,i,Spain 2012 Q2 LFS
+es2012j,Spain,ES,ESP,es,2012,,3,LFS,,j,Spain 2012 Q3 LFS
+es2012k,Spain,ES,ESP,es,2012,,4,LFS,,k,Spain 2012 Q4 LFS
+es2013h,Spain,ES,ESP,es,2013,,1,LFS,,h,Spain 2013 Q1 LFS
+es2013i,Spain,ES,ESP,es,2013,,2,LFS,,i,Spain 2013 Q2 LFS
+es2013j,Spain,ES,ESP,es,2013,,3,LFS,,j,Spain 2013 Q3 LFS
+es2013k,Spain,ES,ESP,es,2013,,4,LFS,,k,Spain 2013 Q4 LFS
+es2014h,Spain,ES,ESP,es,2014,,1,LFS,,h,Spain 2014 Q1 LFS
+es2014i,Spain,ES,ESP,es,2014,,2,LFS,,i,Spain 2014 Q2 LFS
+es2014j,Spain,ES,ESP,es,2014,,3,LFS,,j,Spain 2014 Q3 LFS
+es2014k,Spain,ES,ESP,es,2014,,4,LFS,,k,Spain 2014 Q4 LFS
+es2015h,Spain,ES,ESP,es,2015,,1,LFS,,h,Spain 2015 Q1 LFS
+es2015i,Spain,ES,ESP,es,2015,,2,LFS,,i,Spain 2015 Q2 LFS
+es2015j,Spain,ES,ESP,es,2015,,3,LFS,,j,Spain 2015 Q3 LFS
+es2015k,Spain,ES,ESP,es,2015,,4,LFS,,k,Spain 2015 Q4 LFS
+es2016h,Spain,ES,ESP,es,2016,,1,LFS,,h,Spain 2016 Q1 LFS
+es2016i,Spain,ES,ESP,es,2016,,2,LFS,,i,Spain 2016 Q2 LFS
+es2016j,Spain,ES,ESP,es,2016,,3,LFS,,j,Spain 2016 Q3 LFS
+es2016k,Spain,ES,ESP,es,2016,,4,LFS,,k,Spain 2016 Q4 LFS
+es2017h,Spain,ES,ESP,es,2017,,1,LFS,,h,Spain 2017 Q1 LFS
+es2017i,Spain,ES,ESP,es,2017,,2,LFS,,i,Spain 2017 Q2 LFS
+es2017j,Spain,ES,ESP,es,2017,,3,LFS,,j,Spain 2017 Q3 LFS
+es2017k,Spain,ES,ESP,es,2017,,4,LFS,,k,Spain 2017 Q4 LFS
+es2018h,Spain,ES,ESP,es,2018,,1,LFS,,h,Spain 2018 Q1 LFS
+es2018i,Spain,ES,ESP,es,2018,,2,LFS,,i,Spain 2018 Q2 LFS
+es2018j,Spain,ES,ESP,es,2018,,3,LFS,,j,Spain 2018 Q3 LFS
+es2018k,Spain,ES,ESP,es,2018,,4,LFS,,k,Spain 2018 Q4 LFS
+es2019h,Spain,ES,ESP,es,2019,,1,LFS,,h,Spain 2019 Q1 LFS
+es2019i,Spain,ES,ESP,es,2019,,2,LFS,,i,Spain 2019 Q2 LFS
+es2019j,Spain,ES,ESP,es,2019,,3,LFS,,j,Spain 2019 Q3 LFS
+es2019k,Spain,ES,ESP,es,2019,,4,LFS,,k,Spain 2019 Q4 LFS
+es2020h,Spain,ES,ESP,es,2020,,1,LFS,,h,Spain 2020 Q1 LFS
+es2020i,Spain,ES,ESP,es,2020,,2,LFS,,i,Spain 2020 Q2 LFS
+es2020j,Spain,ES,ESP,es,2020,,3,LFS,,j,Spain 2020 Q3 LFS
+es2020k,Spain,ES,ESP,es,2020,,4,LFS,,k,Spain 2020 Q4 LFS
+et1984a,Ethiopia,ET,ETH,et,1984,,,census,,a,Ethiopia 1984
+et1994a,Ethiopia,ET,ETH,et,1994,,,census,,a,Ethiopia 1994
+et2007a,Ethiopia,ET,ETH,et,2007,,,census,,a,Ethiopia 2007
+fi2010a,Finland,FI,FIN,fi,2010,,,census,,a,Finland 2010
+fj1966a,Fiji,FJ,FJI,fj,1966,,,census,,a,Fiji 1966
+fj1976a,Fiji,FJ,FJI,fj,1976,,,census,,a,Fiji 1976
+fj1986a,Fiji,FJ,FJI,fj,1986,,,census,,a,Fiji 1986
+fj1996a,Fiji,FJ,FJI,fj,1996,,,census,,a,Fiji 1996
+fj2007a,Fiji,FJ,FJI,fj,2007,,,census,,a,Fiji 2007
+fj2014a,Fiji,FJ,FJI,fj,2014,,,census,,a,Fiji 2014
+fr1962a,France,FR,FRA,fr,1962,,,census,,a,France 1962
+fr1968a,France,FR,FRA,fr,1968,,,census,,a,France 1968
+fr1975a,France,FR,FRA,fr,1975,,,census,,a,France 1975
+fr1982a,France,FR,FRA,fr,1982,,,census,,a,France 1982
+fr1990a,France,FR,FRA,fr,1990,,,census,,a,France 1990
+fr1999a,France,FR,FRA,fr,1999,,,census,,a,France 1999
+fr2006a,France,FR,FRA,fr,2006,,,census,,a,France 2006
+fr2011a,France,FR,FRA,fr,2011,,,census,,a,France 2011
+gh1984a,Ghana,GH,GHA,gh,1984,,,census,,a,Ghana 1984
+gh2000a,Ghana,GH,GHA,gh,2000,,,census,,a,Ghana 2000
+gh2010a,Ghana,GH,GHA,gh,2010,,,census,,a,Ghana 2010
+gn1983a,Guinea,GN,GIN,gn,1983,,,census,,a,Guinea 1983
+gn1996a,Guinea,GN,GIN,gn,1996,,,census,,a,Guinea 1996
+gn2014a,Guinea,GN,GIN,gn,2014,,,census,,a,Guinea 2014
+gr1971a,Greece,GR,GRC,gr,1971,,,census,,a,Greece 1971
+gr1981a,Greece,GR,GRC,gr,1981,,,census,,a,Greece 1981
+gr1991a,Greece,GR,GRC,gr,1991,,,census,,a,Greece 1991
+gr2001a,Greece,GR,GRC,gr,2001,,,census,,a,Greece 2001
+gr2011a,Greece,GR,GRC,gr,2011,,,census,,a,Greece 2011
+gt1964a,Guatemala,GT,GTM,gt,1964,,,census,,a,Guatemala 1964
+gt1973a,Guatemala,GT,GTM,gt,1973,,,census,,a,Guatemala 1973
+gt1981a,Guatemala,GT,GTM,gt,1981,,,census,,a,Guatemala 1981
+gt1994a,Guatemala,GT,GTM,gt,1994,,,census,,a,Guatemala 1994
+gt2002a,Guatemala,GT,GTM,gt,2002,,,census,,a,Guatemala 2002
+hn1961a,Honduras,HN,HND,hn,1961,,,census,,a,Honduras 1961
+hn1974a,Honduras,HN,HND,hn,1974,,,census,,a,Honduras 1974
+hn1988a,Honduras,HN,HND,hn,1988,,,census,,a,Honduras 1988
+hn2001a,Honduras,HN,HND,hn,2001,,,census,,a,Honduras 2001
+hn2013a,Honduras,HN,HND,hn,2013,,,census,,a,Honduras 2013
+ht1971a,Haiti,HT,HTI,ht,1971,,,census,,a,Haiti 1971
+ht1982a,Haiti,HT,HTI,ht,1982,,,census,,a,Haiti 1982
+ht2003a,Haiti,HT,HTI,ht,2003,,,census,,a,Haiti 2003
+hu1970a,Hungary,HU,HUN,hu,1970,,,census,,a,Hungary 1970
+hu1980a,Hungary,HU,HUN,hu,1980,,,census,,a,Hungary 1980
+hu1990a,Hungary,HU,HUN,hu,1990,,,census,,a,Hungary 1990
+hu2001a,Hungary,HU,HUN,hu,2001,,,census,,a,Hungary 2001
+hu2011a,Hungary,HU,HUN,hu,2011,,,census,,a,Hungary 2011
+id1971a,Indonesia,ID,IDN,id,1971,,,census,,a,Indonesia 1971
+id1976a,Indonesia,ID,IDN,id,1976,,,census,,a,Indonesia 1976
+id1980a,Indonesia,ID,IDN,id,1980,,,census,,a,Indonesia 1980
+id1985a,Indonesia,ID,IDN,id,1985,,,census,,a,Indonesia 1985
+id1990a,Indonesia,ID,IDN,id,1990,,,census,,a,Indonesia 1990
+id1995a,Indonesia,ID,IDN,id,1995,,,census,,a,Indonesia 1995
+id2000a,Indonesia,ID,IDN,id,2000,,,census,,a,Indonesia 2000
+id2005a,Indonesia,ID,IDN,id,2005,,,census,,a,Indonesia 2005
+id2010a,Indonesia,ID,IDN,id,2010,,,census,,a,Indonesia 2010
+ie1901a,Ireland,IE,IRL,ie,1901,,,census,,a,Ireland 1901
+ie1911a,Ireland,IE,IRL,ie,1911,,,census,,a,Ireland 1911
+ie1971a,Ireland,IE,IRL,ie,1971,,,census,,a,Ireland 1971
+ie1979a,Ireland,IE,IRL,ie,1979,,,census,,a,Ireland 1979
+ie1981a,Ireland,IE,IRL,ie,1981,,,census,,a,Ireland 1981
+ie1986a,Ireland,IE,IRL,ie,1986,,,census,,a,Ireland 1986
+ie1991a,Ireland,IE,IRL,ie,1991,,,census,,a,Ireland 1991
+ie1996a,Ireland,IE,IRL,ie,1996,,,census,,a,Ireland 1996
+ie2002a,Ireland,IE,IRL,ie,2002,,,census,,a,Ireland 2002
+ie2006a,Ireland,IE,IRL,ie,2006,,,census,,a,Ireland 2006
+ie2011a,Ireland,IE,IRL,ie,2011,,,census,,a,Ireland 2011
+ie2016a,Ireland,IE,IRL,ie,2016,,,census,,a,Ireland 2016
+il1972a,Israel,IL,ISR,il,1972,,,census,,a,Israel 1972
+il1983a,Israel,IL,ISR,il,1983,,,census,,a,Israel 1983
+il1995a,Israel,IL,ISR,il,1995,,,census,,a,Israel 1995
+il2008a,Israel,IL,ISR,il,2008,,,census,,a,Israel 2008
+in1983a,India,IN,IND,in,1983,,,census,,a,India 1983
+in1987a,India,IN,IND,in,1987,,,census,,a,India 1987
+in1993a,India,IN,IND,in,1993,,,census,,a,India 1993
+in1999a,India,IN,IND,in,1999,,,census,,a,India 1999
+in2004a,India,IN,IND,in,2004,,,census,,a,India 2004
+in2009a,India,IN,IND,in,2009,,,census,,a,India 2009
+iq1997a,Iraq,IQ,IRQ,iq,1997,,,census,,a,Iraq 1997
+ir2006a,Iran,IR,IRN,ir,2006,,,census,,a,Iran 2006
+ir2011a,Iran,IR,IRN,ir,2011,,,census,,a,Iran 2011
+is1703a,Iceland,IS,ISL,is,1703,,,census,,a,Iceland 1703
+is1729a,Iceland,IS,ISL,is,1729,,,census,,a,Iceland 1729
+is1801a,Iceland,IS,ISL,is,1801,,,census,,a,Iceland 1801
+is1901a,Iceland,IS,ISL,is,1901,,,census,,a,Iceland 1901
+is1910a,Iceland,IS,ISL,is,1910,,,census,,a,Iceland 1910
+it2001a,Italy,IT,ITA,it,2001,,,census,,a,Italy 2001
+it2011a,Italy,IT,ITA,it,2011,,,census,,a,Italy 2011
+it2011h,Italy,IT,ITA,it,2011,,1,LFS,,h,Italy 2011 Q1 LFS
+it2012h,Italy,IT,ITA,it,2012,,1,LFS,,h,Italy 2012 Q1 LFS
+it2013h,Italy,IT,ITA,it,2013,,1,LFS,,h,Italy 2013 Q1 LFS
+it2014h,Italy,IT,ITA,it,2014,,1,LFS,,h,Italy 2014 Q1 LFS
+it2015h,Italy,IT,ITA,it,2015,,1,LFS,,h,Italy 2015 Q1 LFS
+it2016h,Italy,IT,ITA,it,2016,,1,LFS,,h,Italy 2016 Q1 LFS
+it2017h,Italy,IT,ITA,it,2017,,1,LFS,,h,Italy 2017 Q1 LFS
+it2018h,Italy,IT,ITA,it,2018,,1,LFS,,h,Italy 2018 Q1 LFS
+it2019h,Italy,IT,ITA,it,2019,,1,LFS,,h,Italy 2019 Q1 LFS
+it2020h,Italy,IT,ITA,it,2020,,1,LFS,,h,Italy 2020 Q1 LFS
+jm1982a,Jamaica,JM,JAM,jm,1982,,,census,,a,Jamaica 1982
+jm1991a,Jamaica,JM,JAM,jm,1991,,,census,,a,Jamaica 1991
+jm2001a,Jamaica,JM,JAM,jm,2001,,,census,,a,Jamaica 2001
+jo2004a,Jordan,JO,JOR,jo,2004,,,census,,a,Jordan 2004
+ke1969a,Kenya,KE,KEN,ke,1969,,,census,,a,Kenya 1969
+ke1979a,Kenya,KE,KEN,ke,1979,,,census,,a,Kenya 1979
+ke1989a,Kenya,KE,KEN,ke,1989,,,census,,a,Kenya 1989
+ke1999a,Kenya,KE,KEN,ke,1999,,,census,,a,Kenya 1999
+ke2009a,Kenya,KE,KEN,ke,2009,,,census,,a,Kenya 2009
+ke2019a,Kenya,KE,KEN,ke,2019,,,census,,a,Kenya 2019
+kg1999a,Kyrgyzstan,KG,KGZ,kg,1999,,,census,,a,Kyrgyzstan 1999
+kg2009a,Kyrgyzstan,KG,KGZ,kg,2009,,,census,,a,Kyrgyzstan 2009
+kh1998a,Cambodia,KH,KHM,kh,1998,,,census,,a,Cambodia 1998
+kh2004a,Cambodia,KH,KHM,kh,2004,,,census,,a,Cambodia 2004
+kh2008a,Cambodia,KH,KHM,kh,2008,,,census,,a,Cambodia 2008
+kh2013a,Cambodia,KH,KHM,kh,2013,,,census,,a,Cambodia 2013
+kh2019a,Cambodia,KH,KHM,kh,2019,,,census,,a,Cambodia 2019
+la1995a,Laos,LA,LAO,la,1995,,,census,,a,Laos 1995
+la2005a,Laos,LA,LAO,la,2005,,,census,,a,Laos 2005
+la2015a,Laos,LA,LAO,la,2015,,,census,,a,Laos 2015
+lc1980a,Saint Lucia,LC,LCA,lc,1980,,,census,,a,Saint Lucia 1980
+lc1991a,Saint Lucia,LC,LCA,lc,1991,,,census,,a,Saint Lucia 1991
+lr1974a,Liberia,LR,LBR,lr,1974,,,census,,a,Liberia 1974
+lr2008a,Liberia,LR,LBR,lr,2008,,,census,,a,Liberia 2008
+ls1996a,Lesotho,LS,LSO,ls,1996,,,census,,a,Lesotho 1996
+ls2006a,Lesotho,LS,LSO,ls,2006,,,census,,a,Lesotho 2006
+ma1982a,Morocco,MA,MAR,ma,1982,,,census,,a,Morocco 1982
+ma1994a,Morocco,MA,MAR,ma,1994,,,census,,a,Morocco 1994
+ma2004a,Morocco,MA,MAR,ma,2004,,,census,,a,Morocco 2004
+ma2014a,Morocco,MA,MAR,ma,2014,,,census,,a,Morocco 2014
+ml1987a,Mali,ML,MLI,ml,1987,,,census,,a,Mali 1987
+ml1998a,Mali,ML,MLI,ml,1998,,,census,,a,Mali 1998
+ml2009a,Mali,ML,MLI,ml,2009,,,census,,a,Mali 2009
+mm2014a,Myanmar,MM,MMR,mm,2014,,,census,,a,Myanmar 2014
+mn1989a,Mongolia,MN,MNG,mn,1989,,,census,,a,Mongolia 1989
+mn2000a,Mongolia,MN,MNG,mn,2000,,,census,,a,Mongolia 2000
+mn2010a,Mongolia,MN,MNG,mn,2010,,,census,,a,Mongolia 2010
+mn2020a,Mongolia,MN,MNG,mn,2020,,,census,,a,Mongolia 2020
+mu1990a,Mauritius,MU,MUS,mu,1990,,,census,,a,Mauritius 1990
+mu2000a,Mauritius,MU,MUS,mu,2000,,,census,,a,Mauritius 2000
+mu2011a,Mauritius,MU,MUS,mu,2011,,,census,,a,Mauritius 2011
+mw1987a,Malawi,MW,MWI,mw,1987,,,census,,a,Malawi 1987
+mw1998a,Malawi,MW,MWI,mw,1998,,,census,,a,Malawi 1998
+mw2008a,Malawi,MW,MWI,mw,2008,,,census,,a,Malawi 2008
+mw2018a,Malawi,MW,MWI,mw,2018,,,census,,a,Malawi 2018
+mx1960a,Mexico,MX,MEX,mx,1960,,,census,,a,Mexico 1960
+mx1970a,Mexico,MX,MEX,mx,1970,,,census,,a,Mexico 1970
+mx1990a,Mexico,MX,MEX,mx,1990,,,census,,a,Mexico 1990
+mx1995a,Mexico,MX,MEX,mx,1995,,,census,,a,Mexico 1995
+mx2000a,Mexico,MX,MEX,mx,2000,,,census,,a,Mexico 2000
+mx2005a,Mexico,MX,MEX,mx,2005,,,census,,a,Mexico 2005
+mx2005h,Mexico,MX,MEX,mx,2005,,1,LFS,,h,Mexico 2005 Q1 LFS
+mx2005i,Mexico,MX,MEX,mx,2005,,2,LFS,,i,Mexico 2005 Q2 LFS
+mx2005j,Mexico,MX,MEX,mx,2005,,3,LFS,,j,Mexico 2005 Q3 LFS
+mx2005k,Mexico,MX,MEX,mx,2005,,4,LFS,,k,Mexico 2005 Q4 LFS
+mx2006h,Mexico,MX,MEX,mx,2006,,1,LFS,,h,Mexico 2006 Q1 LFS
+mx2006i,Mexico,MX,MEX,mx,2006,,2,LFS,,i,Mexico 2006 Q2 LFS
+mx2006j,Mexico,MX,MEX,mx,2006,,3,LFS,,j,Mexico 2006 Q3 LFS
+mx2006k,Mexico,MX,MEX,mx,2006,,4,LFS,,k,Mexico 2006 Q4 LFS
+mx2007h,Mexico,MX,MEX,mx,2007,,1,LFS,,h,Mexico 2007 Q1 LFS
+mx2007i,Mexico,MX,MEX,mx,2007,,2,LFS,,i,Mexico 2007 Q2 LFS
+mx2007j,Mexico,MX,MEX,mx,2007,,3,LFS,,j,Mexico 2007 Q3 LFS
+mx2007k,Mexico,MX,MEX,mx,2007,,4,LFS,,k,Mexico 2007 Q4 LFS
+mx2008h,Mexico,MX,MEX,mx,2008,,1,LFS,,h,Mexico 2008 Q1 LFS
+mx2008i,Mexico,MX,MEX,mx,2008,,2,LFS,,i,Mexico 2008 Q2 LFS
+mx2008j,Mexico,MX,MEX,mx,2008,,3,LFS,,j,Mexico 2008 Q3 LFS
+mx2008k,Mexico,MX,MEX,mx,2008,,4,LFS,,k,Mexico 2008 Q4 LFS
+mx2009h,Mexico,MX,MEX,mx,2009,,1,LFS,,h,Mexico 2009 Q1 LFS
+mx2009i,Mexico,MX,MEX,mx,2009,,2,LFS,,i,Mexico 2009 Q2 LFS
+mx2009j,Mexico,MX,MEX,mx,2009,,3,LFS,,j,Mexico 2009 Q3 LFS
+mx2009k,Mexico,MX,MEX,mx,2009,,4,LFS,,k,Mexico 2009 Q4 LFS
+mx2010a,Mexico,MX,MEX,mx,2010,,,census,,a,Mexico 2010
+mx2010h,Mexico,MX,MEX,mx,2010,,1,LFS,,h,Mexico 2010 Q1 LFS
+mx2010i,Mexico,MX,MEX,mx,2010,,2,LFS,,i,Mexico 2010 Q2 LFS
+mx2010j,Mexico,MX,MEX,mx,2010,,3,LFS,,j,Mexico 2010 Q3 LFS
+mx2010k,Mexico,MX,MEX,mx,2010,,4,LFS,,k,Mexico 2010 Q4 LFS
+mx2011h,Mexico,MX,MEX,mx,2011,,1,LFS,,h,Mexico 2011 Q1 LFS
+mx2011i,Mexico,MX,MEX,mx,2011,,2,LFS,,i,Mexico 2011 Q2 LFS
+mx2011j,Mexico,MX,MEX,mx,2011,,3,LFS,,j,Mexico 2011 Q3 LFS
+mx2011k,Mexico,MX,MEX,mx,2011,,4,LFS,,k,Mexico 2011 Q4 LFS
+mx2012h,Mexico,MX,MEX,mx,2012,,1,LFS,,h,Mexico 2012 Q1 LFS
+mx2012i,Mexico,MX,MEX,mx,2012,,2,LFS,,i,Mexico 2012 Q2 LFS
+mx2012j,Mexico,MX,MEX,mx,2012,,3,LFS,,j,Mexico 2012 Q3 LFS
+mx2012k,Mexico,MX,MEX,mx,2012,,4,LFS,,k,Mexico 2012 Q4 LFS
+mx2013h,Mexico,MX,MEX,mx,2013,,1,LFS,,h,Mexico 2013 Q1 LFS
+mx2013i,Mexico,MX,MEX,mx,2013,,2,LFS,,i,Mexico 2013 Q2 LFS
+mx2013j,Mexico,MX,MEX,mx,2013,,3,LFS,,j,Mexico 2013 Q3 LFS
+mx2013k,Mexico,MX,MEX,mx,2013,,4,LFS,,k,Mexico 2013 Q4 LFS
+mx2014h,Mexico,MX,MEX,mx,2014,,1,LFS,,h,Mexico 2014 Q1 LFS
+mx2014i,Mexico,MX,MEX,mx,2014,,2,LFS,,i,Mexico 2014 Q2 LFS
+mx2014j,Mexico,MX,MEX,mx,2014,,3,LFS,,j,Mexico 2014 Q3 LFS
+mx2014k,Mexico,MX,MEX,mx,2014,,4,LFS,,k,Mexico 2014 Q4 LFS
+mx2015a,Mexico,MX,MEX,mx,2015,,,census,,a,Mexico 2015
+mx2015h,Mexico,MX,MEX,mx,2015,,1,LFS,,h,Mexico 2015 Q1 LFS
+mx2015i,Mexico,MX,MEX,mx,2015,,2,LFS,,i,Mexico 2015 Q2 LFS
+mx2015j,Mexico,MX,MEX,mx,2015,,3,LFS,,j,Mexico 2015 Q3 LFS
+mx2015k,Mexico,MX,MEX,mx,2015,,4,LFS,,k,Mexico 2015 Q4 LFS
+mx2016h,Mexico,MX,MEX,mx,2016,,1,LFS,,h,Mexico 2016 Q1 LFS
+mx2016i,Mexico,MX,MEX,mx,2016,,2,LFS,,i,Mexico 2016 Q2 LFS
+mx2016j,Mexico,MX,MEX,mx,2016,,3,LFS,,j,Mexico 2016 Q3 LFS
+mx2016k,Mexico,MX,MEX,mx,2016,,4,LFS,,k,Mexico 2016 Q4 LFS
+mx2017h,Mexico,MX,MEX,mx,2017,,1,LFS,,h,Mexico 2017 Q1 LFS
+mx2017i,Mexico,MX,MEX,mx,2017,,2,LFS,,i,Mexico 2017 Q2 LFS
+mx2017j,Mexico,MX,MEX,mx,2017,,3,LFS,,j,Mexico 2017 Q3 LFS
+mx2017k,Mexico,MX,MEX,mx,2017,,4,LFS,,k,Mexico 2017 Q4 LFS
+mx2018h,Mexico,MX,MEX,mx,2018,,1,LFS,,h,Mexico 2018 Q1 LFS
+mx2018i,Mexico,MX,MEX,mx,2018,,2,LFS,,i,Mexico 2018 Q2 LFS
+mx2018j,Mexico,MX,MEX,mx,2018,,3,LFS,,j,Mexico 2018 Q3 LFS
+mx2018k,Mexico,MX,MEX,mx,2018,,4,LFS,,k,Mexico 2018 Q4 LFS
+mx2019h,Mexico,MX,MEX,mx,2019,,1,LFS,,h,Mexico 2019 Q1 LFS
+mx2019i,Mexico,MX,MEX,mx,2019,,2,LFS,,i,Mexico 2019 Q2 LFS
+mx2019j,Mexico,MX,MEX,mx,2019,,3,LFS,,j,Mexico 2019 Q3 LFS
+mx2019k,Mexico,MX,MEX,mx,2019,,4,LFS,,k,Mexico 2019 Q4 LFS
+mx2020a,Mexico,MX,MEX,mx,2020,,,census,,a,Mexico 2020
+mx2020h,Mexico,MX,MEX,mx,2020,,1,LFS,,h,Mexico 2020 Q1 LFS
+mx2020j,Mexico,MX,MEX,mx,2020,,3,LFS,,j,Mexico 2020 Q3 LFS
+my1970a,Malaysia,MY,MYS,my,1970,,,census,,a,Malaysia 1970
+my1980a,Malaysia,MY,MYS,my,1980,,,census,,a,Malaysia 1980
+my1991a,Malaysia,MY,MYS,my,1991,,,census,,a,Malaysia 1991
+my2000a,Malaysia,MY,MYS,my,2000,,,census,,a,Malaysia 2000
+mz1997a,Mozambique,MZ,MOZ,mz,1997,,,census,,a,Mozambique 1997
+mz2007a,Mozambique,MZ,MOZ,mz,2007,,,census,,a,Mozambique 2007
+mz2017a,Mozambique,MZ,MOZ,mz,2017,,,census,,a,Mozambique 2017
+ng2006a,Nigeria,NG,NGA,ng,2006,2007,,census,,a,Nigeria 2006-07
+ng2007a,Nigeria,NG,NGA,ng,2007,2008,,census,,a,Nigeria 2007-08
+ng2008a,Nigeria,NG,NGA,ng,2008,2009,,census,,a,Nigeria 2008-09
+ng2009a,Nigeria,NG,NGA,ng,2009,2010,,census,,a,Nigeria 2009-10
+ng2010a,Nigeria,NG,NGA,ng,2010,2011,,census,,a,Nigeria 2010-11
+ni1971a,Nicaragua,NI,NIC,ni,1971,,,census,,a,Nicaragua 1971
+ni1995a,Nicaragua,NI,NIC,ni,1995,,,census,,a,Nicaragua 1995
+ni2005a,Nicaragua,NI,NIC,ni,2005,,,census,,a,Nicaragua 2005
+nl1960a,Netherlands,NL,NLD,nl,1960,,,census,,a,Netherlands 1960
+nl1971a,Netherlands,NL,NLD,nl,1971,,,census,,a,Netherlands 1971
+nl2001a,Netherlands,NL,NLD,nl,2001,,,census,,a,Netherlands 2001
+nl2011a,Netherlands,NL,NLD,nl,2011,,,census,,a,Netherlands 2011
+no1801a,Norway,NO,NOR,no,1801,,,census,,a,Norway 1801
+no1865a,Norway,NO,NOR,no,1865,,,census,,a,Norway 1865
+no1875a,Norway,NO,NOR,no,1875,,,census,,a,Norway 1875
+no1900a,Norway,NO,NOR,no,1900,,,census,,a,Norway 1900
+no1910a,Norway,NO,NOR,no,1910,,,census,,a,Norway 1910
+np2001a,Nepal,NP,NPL,np,2001,,,census,,a,Nepal 2001
+np2011a,Nepal,NP,NPL,np,2011,,,census,,a,Nepal 2011
+pa1960a,Panama,PA,PAN,pa,1960,,,census,,a,Panama 1960
+pa1970a,Panama,PA,PAN,pa,1970,,,census,,a,Panama 1970
+pa1980a,Panama,PA,PAN,pa,1980,,,census,,a,Panama 1980
+pa1990a,Panama,PA,PAN,pa,1990,,,census,,a,Panama 1990
+pa2000a,Panama,PA,PAN,pa,2000,,,census,,a,Panama 2000
+pa2010a,Panama,PA,PAN,pa,2010,,,census,,a,Panama 2010
+pe1993a,Peru,PE,PER,pe,1993,,,census,,a,Peru 1993
+pe2007a,Peru,PE,PER,pe,2007,,,census,,a,Peru 2007
+pe2017a,Peru,PE,PER,pe,2017,,,census,,a,Peru 2017
+pg1980a,Papua New Guinea,PG,PNG,pg,1980,,,census,,a,Papua New Guinea 1980
+pg1990a,Papua New Guinea,PG,PNG,pg,1990,,,census,,a,Papua New Guinea 1990
+pg2000a,Papua New Guinea,PG,PNG,pg,2000,,,census,,a,Papua New Guinea 2000
+ph1990a,Philippines,PH,PHL,ph,1990,,,census,,a,Philippines 1990
+ph1995a,Philippines,PH,PHL,ph,1995,,,census,,a,Philippines 1995
+ph1997h,Philippines,PH,PHL,ph,1997,,1,LFS,,h,Philippines 1997 Q1 LFS
+ph1997i,Philippines,PH,PHL,ph,1997,,2,LFS,,i,Philippines 1997 Q2 LFS
+ph1997j,Philippines,PH,PHL,ph,1997,,3,LFS,,j,Philippines 1997 Q3 LFS
+ph1997k,Philippines,PH,PHL,ph,1997,,4,LFS,,k,Philippines 1997 Q4 LFS
+ph1998h,Philippines,PH,PHL,ph,1998,,1,LFS,,h,Philippines 1998 Q1 LFS
+ph1998i,Philippines,PH,PHL,ph,1998,,2,LFS,,i,Philippines 1998 Q2 LFS
+ph1998j,Philippines,PH,PHL,ph,1998,,3,LFS,,j,Philippines 1998 Q3 LFS
+ph1998k,Philippines,PH,PHL,ph,1998,,4,LFS,,k,Philippines 1998 Q4 LFS
+ph1999h,Philippines,PH,PHL,ph,1999,,1,LFS,,h,Philippines 1999 Q1 LFS
+ph1999i,Philippines,PH,PHL,ph,1999,,2,LFS,,i,Philippines 1999 Q2 LFS
+ph1999j,Philippines,PH,PHL,ph,1999,,3,LFS,,j,Philippines 1999 Q3 LFS
+ph1999k,Philippines,PH,PHL,ph,1999,,4,LFS,,k,Philippines 1999 Q4 LFS
+ph2000a,Philippines,PH,PHL,ph,2000,,,census,,a,Philippines 2000
+ph2000h,Philippines,PH,PHL,ph,2000,,1,LFS,,h,Philippines 2000 Q1 LFS
+ph2000i,Philippines,PH,PHL,ph,2000,,2,LFS,,i,Philippines 2000 Q2 LFS
+ph2000j,Philippines,PH,PHL,ph,2000,,3,LFS,,j,Philippines 2000 Q3 LFS
+ph2000k,Philippines,PH,PHL,ph,2000,,4,LFS,,k,Philippines 2000 Q4 LFS
+ph2001h,Philippines,PH,PHL,ph,2001,,1,LFS,,h,Philippines 2001 Q1 LFS
+ph2001i,Philippines,PH,PHL,ph,2001,,2,LFS,,i,Philippines 2001 Q2 LFS
+ph2001j,Philippines,PH,PHL,ph,2001,,3,LFS,,j,Philippines 2001 Q3 LFS
+ph2001k,Philippines,PH,PHL,ph,2001,,4,LFS,,k,Philippines 2001 Q4 LFS
+ph2002h,Philippines,PH,PHL,ph,2002,,1,LFS,,h,Philippines 2002 Q1 LFS
+ph2002i,Philippines,PH,PHL,ph,2002,,2,LFS,,i,Philippines 2002 Q2 LFS
+ph2002j,Philippines,PH,PHL,ph,2002,,3,LFS,,j,Philippines 2002 Q3 LFS
+ph2002k,Philippines,PH,PHL,ph,2002,,4,LFS,,k,Philippines 2002 Q4 LFS
+ph2003h,Philippines,PH,PHL,ph,2003,,1,LFS,,h,Philippines 2003 Q1 LFS
+ph2003i,Philippines,PH,PHL,ph,2003,,2,LFS,,i,Philippines 2003 Q2 LFS
+ph2003j,Philippines,PH,PHL,ph,2003,,3,LFS,,j,Philippines 2003 Q3 LFS
+ph2003k,Philippines,PH,PHL,ph,2003,,4,LFS,,k,Philippines 2003 Q4 LFS
+ph2004h,Philippines,PH,PHL,ph,2004,,1,LFS,,h,Philippines 2004 Q1 LFS
+ph2004i,Philippines,PH,PHL,ph,2004,,2,LFS,,i,Philippines 2004 Q2 LFS
+ph2004j,Philippines,PH,PHL,ph,2004,,3,LFS,,j,Philippines 2004 Q3 LFS
+ph2004k,Philippines,PH,PHL,ph,2004,,4,LFS,,k,Philippines 2004 Q4 LFS
+ph2005h,Philippines,PH,PHL,ph,2005,,1,LFS,,h,Philippines 2005 Q1 LFS
+ph2005i,Philippines,PH,PHL,ph,2005,,2,LFS,,i,Philippines 2005 Q2 LFS
+ph2005j,Philippines,PH,PHL,ph,2005,,3,LFS,,j,Philippines 2005 Q3 LFS
+ph2005k,Philippines,PH,PHL,ph,2005,,4,LFS,,k,Philippines 2005 Q4 LFS
+ph2006h,Philippines,PH,PHL,ph,2006,,1,LFS,,h,Philippines 2006 Q1 LFS
+ph2006i,Philippines,PH,PHL,ph,2006,,2,LFS,,i,Philippines 2006 Q2 LFS
+ph2006j,Philippines,PH,PHL,ph,2006,,3,LFS,,j,Philippines 2006 Q3 LFS
+ph2006k,Philippines,PH,PHL,ph,2006,,4,LFS,,k,Philippines 2006 Q4 LFS
+ph2007h,Philippines,PH,PHL,ph,2007,,1,LFS,,h,Philippines 2007 Q1 LFS
+ph2007i,Philippines,PH,PHL,ph,2007,,2,LFS,,i,Philippines 2007 Q2 LFS
+ph2007j,Philippines,PH,PHL,ph,2007,,3,LFS,,j,Philippines 2007 Q3 LFS
+ph2007k,Philippines,PH,PHL,ph,2007,,4,LFS,,k,Philippines 2007 Q4 LFS
+ph2008h,Philippines,PH,PHL,ph,2008,,1,LFS,,h,Philippines 2008 Q1 LFS
+ph2008i,Philippines,PH,PHL,ph,2008,,2,LFS,,i,Philippines 2008 Q2 LFS
+ph2008j,Philippines,PH,PHL,ph,2008,,3,LFS,,j,Philippines 2008 Q3 LFS
+ph2008k,Philippines,PH,PHL,ph,2008,,4,LFS,,k,Philippines 2008 Q4 LFS
+ph2009h,Philippines,PH,PHL,ph,2009,,1,LFS,,h,Philippines 2009 Q1 LFS
+ph2009i,Philippines,PH,PHL,ph,2009,,2,LFS,,i,Philippines 2009 Q2 LFS
+ph2009j,Philippines,PH,PHL,ph,2009,,3,LFS,,j,Philippines 2009 Q3 LFS
+ph2009k,Philippines,PH,PHL,ph,2009,,4,LFS,,k,Philippines 2009 Q4 LFS
+ph2010a,Philippines,PH,PHL,ph,2010,,,census,,a,Philippines 2010
+ph2010h,Philippines,PH,PHL,ph,2010,,1,LFS,,h,Philippines 2010 Q1 LFS
+ph2010i,Philippines,PH,PHL,ph,2010,,2,LFS,,i,Philippines 2010 Q2 LFS
+ph2010j,Philippines,PH,PHL,ph,2010,,3,LFS,,j,Philippines 2010 Q3 LFS
+ph2010k,Philippines,PH,PHL,ph,2010,,4,LFS,,k,Philippines 2010 Q4 LFS
+ph2011h,Philippines,PH,PHL,ph,2011,,1,LFS,,h,Philippines 2011 Q1 LFS
+ph2011i,Philippines,PH,PHL,ph,2011,,2,LFS,,i,Philippines 2011 Q2 LFS
+ph2011j,Philippines,PH,PHL,ph,2011,,3,LFS,,j,Philippines 2011 Q3 LFS
+ph2011k,Philippines,PH,PHL,ph,2011,,4,LFS,,k,Philippines 2011 Q4 LFS
+ph2012h,Philippines,PH,PHL,ph,2012,,1,LFS,,h,Philippines 2012 Q1 LFS
+ph2012i,Philippines,PH,PHL,ph,2012,,2,LFS,,i,Philippines 2012 Q2 LFS
+ph2012j,Philippines,PH,PHL,ph,2012,,3,LFS,,j,Philippines 2012 Q3 LFS
+ph2012k,Philippines,PH,PHL,ph,2012,,4,LFS,,k,Philippines 2012 Q4 LFS
+ph2013h,Philippines,PH,PHL,ph,2013,,1,LFS,,h,Philippines 2013 Q1 LFS
+ph2013i,Philippines,PH,PHL,ph,2013,,2,LFS,,i,Philippines 2013 Q2 LFS
+ph2013j,Philippines,PH,PHL,ph,2013,,3,LFS,,j,Philippines 2013 Q3 LFS
+ph2013k,Philippines,PH,PHL,ph,2013,,4,LFS,,k,Philippines 2013 Q4 LFS
+ph2014h,Philippines,PH,PHL,ph,2014,,1,LFS,,h,Philippines 2014 Q1 LFS
+ph2014i,Philippines,PH,PHL,ph,2014,,2,LFS,,i,Philippines 2014 Q2 LFS
+ph2014j,Philippines,PH,PHL,ph,2014,,3,LFS,,j,Philippines 2014 Q3 LFS
+ph2014k,Philippines,PH,PHL,ph,2014,,4,LFS,,k,Philippines 2014 Q4 LFS
+ph2015h,Philippines,PH,PHL,ph,2015,,1,LFS,,h,Philippines 2015 Q1 LFS
+ph2015i,Philippines,PH,PHL,ph,2015,,2,LFS,,i,Philippines 2015 Q2 LFS
+ph2015j,Philippines,PH,PHL,ph,2015,,3,LFS,,j,Philippines 2015 Q3 LFS
+ph2015k,Philippines,PH,PHL,ph,2015,,4,LFS,,k,Philippines 2015 Q4 LFS
+ph2016h,Philippines,PH,PHL,ph,2016,,1,LFS,,h,Philippines 2016 Q1 LFS
+ph2016i,Philippines,PH,PHL,ph,2016,,2,LFS,,i,Philippines 2016 Q2 LFS
+ph2016j,Philippines,PH,PHL,ph,2016,,3,LFS,,j,Philippines 2016 Q3 LFS
+ph2016k,Philippines,PH,PHL,ph,2016,,4,LFS,,k,Philippines 2016 Q4 LFS
+ph2017h,Philippines,PH,PHL,ph,2017,,1,LFS,,h,Philippines 2017 Q1 LFS
+ph2017i,Philippines,PH,PHL,ph,2017,,2,LFS,,i,Philippines 2017 Q2 LFS
+ph2017j,Philippines,PH,PHL,ph,2017,,3,LFS,,j,Philippines 2017 Q3 LFS
+ph2017k,Philippines,PH,PHL,ph,2017,,4,LFS,,k,Philippines 2017 Q4 LFS
+ph2018h,Philippines,PH,PHL,ph,2018,,1,LFS,,h,Philippines 2018 Q1 LFS
+ph2018i,Philippines,PH,PHL,ph,2018,,2,LFS,,i,Philippines 2018 Q2 LFS
+ph2018j,Philippines,PH,PHL,ph,2018,,3,LFS,,j,Philippines 2018 Q3 LFS
+ph2018k,Philippines,PH,PHL,ph,2018,,4,LFS,,k,Philippines 2018 Q4 LFS
+ph2019h,Philippines,PH,PHL,ph,2019,,1,LFS,,h,Philippines 2019 Q1 LFS
+ph2019i,Philippines,PH,PHL,ph,2019,,2,LFS,,i,Philippines 2019 Q2 LFS
+ph2019j,Philippines,PH,PHL,ph,2019,,3,LFS,,j,Philippines 2019 Q3 LFS
+pk1973a,Pakistan,PK,PAK,pk,1973,,,census,,a,Pakistan 1973
+pk1981a,Pakistan,PK,PAK,pk,1981,,,census,,a,Pakistan 1981
+pk1998a,Pakistan,PK,PAK,pk,1998,,,census,,a,Pakistan 1998
+pl1978a,Poland,PL,POL,pl,1978,,,census,,a,Poland 1978
+pl1988a,Poland,PL,POL,pl,1988,,,census,,a,Poland 1988
+pl2002a,Poland,PL,POL,pl,2002,,,census,,a,Poland 2002
+pl2011a,Poland,PL,POL,pl,2011,,,census,,a,Poland 2011
+pr1970a,Puerto Rico,PR,PRI,pr,1970,,,census,,a,Puerto Rico 1970
+pr1980a,Puerto Rico,PR,PRI,pr,1980,,,census,,a,Puerto Rico 1980
+pr1990a,Puerto Rico,PR,PRI,pr,1990,,,census,,a,Puerto Rico 1990
+pr2000a,Puerto Rico,PR,PRI,pr,2000,,,census,,a,Puerto Rico 2000
+pr2005a,Puerto Rico,PR,PRI,pr,2005,,,census,,a,Puerto Rico 2005
+pr2010a,Puerto Rico,PR,PRI,pr,2010,,,census,,a,Puerto Rico 2010
+pr2015a,Puerto Rico,PR,PRI,pr,2015,,,census,,a,Puerto Rico 2015
+pr2020a,Puerto Rico,PR,PRI,pr,2020,,,census,,a,Puerto Rico 2020
+ps1997a,Palestine,PS,PSE,ps,1997,,,census,,a,Palestine 1997
+ps2007a,Palestine,PS,PSE,ps,2007,,,census,,a,Palestine 2007
+ps2017a,Palestine,PS,PSE,ps,2017,,,census,,a,Palestine 2017
+pt1981a,Portugal,PT,PRT,pt,1981,,,census,,a,Portugal 1981
+pt1991a,Portugal,PT,PRT,pt,1991,,,census,,a,Portugal 1991
+pt2001a,Portugal,PT,PRT,pt,2001,,,census,,a,Portugal 2001
+pt2011a,Portugal,PT,PRT,pt,2011,,,census,,a,Portugal 2011
+py1962a,Paraguay,PY,PRY,py,1962,,,census,,a,Paraguay 1962
+py1972a,Paraguay,PY,PRY,py,1972,,,census,,a,Paraguay 1972
+py1982a,Paraguay,PY,PRY,py,1982,,,census,,a,Paraguay 1982
+py1992a,Paraguay,PY,PRY,py,1992,,,census,,a,Paraguay 1992
+py2002a,Paraguay,PY,PRY,py,2002,,,census,,a,Paraguay 2002
+ro1977a,Romania,RO,ROU,ro,1977,,,census,,a,Romania 1977
+ro1992a,Romania,RO,ROU,ro,1992,,,census,,a,Romania 1992
+ro2002a,Romania,RO,ROU,ro,2002,,,census,,a,Romania 2002
+ro2011a,Romania,RO,ROU,ro,2011,,,census,,a,Romania 2011
+ru2002a,Russia,RU,RUS,ru,2002,,,census,,a,Russia 2002
+ru2010a,Russia,RU,RUS,ru,2010,,,census,,a,Russia 2010
+rw1991a,Rwanda,RW,RWA,rw,1991,,,census,,a,Rwanda 1991
+rw2002a,Rwanda,RW,RWA,rw,2002,,,census,,a,Rwanda 2002
+rw2012a,Rwanda,RW,RWA,rw,2012,,,census,,a,Rwanda 2012
+sd2008a,Sudan,SD,SDN,sd,2008,,,census,,a,Sudan 2008
+se1880a,Sweden,SE,SWE,se,1880,,,census,,a,Sweden 1880
+se1890a,Sweden,SE,SWE,se,1890,,,census,,a,Sweden 1890
+se1900a,Sweden,SE,SWE,se,1900,,,census,,a,Sweden 1900
+se1910a,Sweden,SE,SWE,se,1910,,,census,,a,Sweden 1910
+si2002a,Slovenia,SI,SVN,si,2002,,,census,,a,Slovenia 2002
+sk1991a,Slovakia,SK,SVK,sk,1991,,,census,,a,Slovakia 1991
+sk2001a,Slovakia,SK,SVK,sk,2001,,,census,,a,Slovakia 2001
+sk2011a,Slovakia,SK,SVK,sk,2011,,,census,,a,Slovakia 2011
+sl2004a,Sierra Leone,SL,SLE,sl,2004,,,census,,a,Sierra Leone 2004
+sl2015a,Sierra Leone,SL,SLE,sl,2015,,,census,,a,Sierra Leone 2015
+sn1988a,Senegal,SN,SEN,sn,1988,,,census,,a,Senegal 1988
+sn2002a,Senegal,SN,SEN,sn,2002,,,census,,a,Senegal 2002
+sn2013a,Senegal,SN,SEN,sn,2013,,,census,,a,Senegal 2013
+sr2004a,Suriname,SR,SUR,sr,2004,,,census,,a,Suriname 2004
+sr2012a,Suriname,SR,SUR,sr,2012,,,census,,a,Suriname 2012
+ss2008a,South Sudan,SS,SSD,ss,2008,,,census,,a,South Sudan 2008
+sv1992a,El Salvador,SV,SLV,sv,1992,,,census,,a,El Salvador 1992
+sv2007a,El Salvador,SV,SLV,sv,2007,,,census,,a,El Salvador 2007
+tg1960a,Togo,TG,TGO,tg,1960,,,census,,a,Togo 1960
+tg1970a,Togo,TG,TGO,tg,1970,,,census,,a,Togo 1970
+tg2010a,Togo,TG,TGO,tg,2010,,,census,,a,Togo 2010
+th1970a,Thailand,TH,THA,th,1970,,,census,,a,Thailand 1970
+th1980a,Thailand,TH,THA,th,1980,,,census,,a,Thailand 1980
+th1990a,Thailand,TH,THA,th,1990,,,census,,a,Thailand 1990
+th2000a,Thailand,TH,THA,th,2000,,,census,,a,Thailand 2000
+tr1985a,Turkey,TR,TUR,tr,1985,,,census,,a,Turkey 1985
+tr1990a,Turkey,TR,TUR,tr,1990,,,census,,a,Turkey 1990
+tr2000a,Turkey,TR,TUR,tr,2000,,,census,,a,Turkey 2000
+tt1970a,Trinidad and Tobago,TT,TTO,tt,1970,,,census,,a,Trinidad and Tobago 1970
+tt1980a,Trinidad and Tobago,TT,TTO,tt,1980,,,census,,a,Trinidad and Tobago 1980
+tt1990a,Trinidad and Tobago,TT,TTO,tt,1990,,,census,,a,Trinidad and Tobago 1990
+tt2000a,Trinidad and Tobago,TT,TTO,tt,2000,,,census,,a,Trinidad and Tobago 2000
+tt2011a,Trinidad and Tobago,TT,TTO,tt,2011,,,census,,a,Trinidad and Tobago 2011
+tz1988a,Tanzania,TZ,TZA,tz,1988,,,census,,a,Tanzania 1988
+tz2002a,Tanzania,TZ,TZA,tz,2002,,,census,,a,Tanzania 2002
+tz2012a,Tanzania,TZ,TZA,tz,2012,,,census,,a,Tanzania 2012
+ua2001a,Ukraine,UA,UKR,ua,2001,,,census,,a,Ukraine 2001
+ug1991a,Uganda,UG,UGA,ug,1991,,,census,,a,Uganda 1991
+ug2002a,Uganda,UG,UGA,ug,2002,,,census,,a,Uganda 2002
+ug2014a,Uganda,UG,UGA,ug,2014,,,census,,a,Uganda 2014
+uk1851a,United Kingdom,GB,GBR,uk,1851,,,census,England and Wales,a,United Kingdom 1851 [England and Wales]
+uk1851b,United Kingdom,GB,GBR,uk,1851,,,census,Scotland,b,United Kingdom 1851 [Scotland]
+uk1851c,United Kingdom,GB,GBR,uk,1851,,,census,Great Britain,c,United Kingdom 1851 [Great Britain]
+uk1861a,United Kingdom,GB,GBR,uk,1861,,,census,England and Wales,a,United Kingdom 1861 [England and Wales]
+uk1861b,United Kingdom,GB,GBR,uk,1861,,,census,Scotland,b,United Kingdom 1861 [Scotland]
+uk1871b,United Kingdom,GB,GBR,uk,1871,,,census,Scotland,b,United Kingdom 1871 [Scotland]
+uk1881a,United Kingdom,GB,GBR,uk,1881,,,census,England and Wales,a,United Kingdom 1881 [England and Wales]
+uk1881b,United Kingdom,GB,GBR,uk,1881,,,census,Scotland,b,United Kingdom 1881 [Scotland]
+uk1891a,United Kingdom,GB,GBR,uk,1891,,,census,England and Wales,a,United Kingdom 1891 [England and Wales]
+uk1891b,United Kingdom,GB,GBR,uk,1891,,,census,Scotland,b,United Kingdom 1891 [Scotland]
+uk1901a,United Kingdom,GB,GBR,uk,1901,,,census,England and Wales,a,United Kingdom 1901 [England and Wales]
+uk1901b,United Kingdom,GB,GBR,uk,1901,,,census,Scotland,b,United Kingdom 1901 [Scotland]
+uk1911a,United Kingdom,GB,GBR,uk,1911,,,census,England and Wales,a,United Kingdom 1911 [England and Wales]
+uk1961a,United Kingdom,GB,GBR,uk,1961,,,census,,a,United Kingdom 1961
+uk1971a,United Kingdom,GB,GBR,uk,1971,,,census,,a,United Kingdom 1971
+uk1991a,United Kingdom,GB,GBR,uk,1991,,,census,,a,United Kingdom 1991
+uk2001a,United Kingdom,GB,GBR,uk,2001,,,census,,a,United Kingdom 2001
+us1850a,United States,US,USA,us,1850,,,census,100%,a,United States 1850 (100%)
+us1850b,United States,US,USA,us,1850,,,census,1%,b,United States 1850 (1%)
+us1860a,United States,US,USA,us,1860,,,census,,a,United States 1860
+us1870a,United States,US,USA,us,1870,,,census,,a,United States 1870
+us1880a,United States,US,USA,us,1880,,,census,100%,a,United States 1880 (100%)
+us1880b,United States,US,USA,us,1880,,,census,10%,b,United States 1880 (10%)
+us1900a,United States,US,USA,us,1900,,,census,,a,United States 1900
+us1910a,United States,US,USA,us,1910,,,census,,a,United States 1910
+us1960a,United States,US,USA,us,1960,,,census,,a,United States 1960
+us1970a,United States,US,USA,us,1970,,,census,,a,United States 1970
+us1980a,United States,US,USA,us,1980,,,census,,a,United States 1980
+us1990a,United States,US,USA,us,1990,,,census,,a,United States 1990
+us2000a,United States,US,USA,us,2000,,,census,,a,United States 2000
+us2005a,United States,US,USA,us,2005,,,census,,a,United States 2005
+us2010a,United States,US,USA,us,2010,,,census,,a,United States 2010
+us2015a,United States,US,USA,us,2015,,,census,,a,United States 2015
+us2020a,United States,US,USA,us,2020,,,census,,a,United States 2020
+uy1963a,Uruguay,UY,URY,uy,1963,,,census,,a,Uruguay 1963
+uy1975a,Uruguay,UY,URY,uy,1975,,,census,,a,Uruguay 1975
+uy1985a,Uruguay,UY,URY,uy,1985,,,census,,a,Uruguay 1985
+uy1996a,Uruguay,UY,URY,uy,1996,,,census,,a,Uruguay 1996
+uy2006a,Uruguay,UY,URY,uy,2006,,,census,,a,Uruguay 2006
+uy2011a,Uruguay,UY,URY,uy,2011,,,census,,a,Uruguay 2011
+ve1971a,Venezuela,VE,VEN,ve,1971,,,census,,a,Venezuela 1971
+ve1981a,Venezuela,VE,VEN,ve,1981,,,census,,a,Venezuela 1981
+ve1990a,Venezuela,VE,VEN,ve,1990,,,census,,a,Venezuela 1990
+ve2001a,Venezuela,VE,VEN,ve,2001,,,census,,a,Venezuela 2001
+vn1989a,Vietnam,VN,VNM,vn,1989,,,census,,a,Vietnam 1989
+vn1999a,Vietnam,VN,VNM,vn,1999,,,census,,a,Vietnam 1999
+vn2009a,Vietnam,VN,VNM,vn,2009,,,census,,a,Vietnam 2009
+vn2019a,Vietnam,VN,VNM,vn,2019,,,census,,a,Vietnam 2019
+za1996a,South Africa,ZA,ZAF,za,1996,,,census,,a,South Africa 1996
+za2001a,South Africa,ZA,ZAF,za,2001,,,census,,a,South Africa 2001
+za2007a,South Africa,ZA,ZAF,za,2007,,,census,,a,South Africa 2007
+za2011a,South Africa,ZA,ZAF,za,2011,,,census,,a,South Africa 2011
+za2016a,South Africa,ZA,ZAF,za,2016,,,census,,a,South Africa 2016
+zm1990a,Zambia,ZM,ZMB,zm,1990,,,census,,a,Zambia 1990
+zm2000a,Zambia,ZM,ZMB,zm,2000,,,census,,a,Zambia 2000
+zm2010a,Zambia,ZM,ZMB,zm,2010,,,census,,a,Zambia 2010
+zw2012a,Zimbabwe,ZW,ZWE,zw,2012,,,census,,a,Zimbabwe 2012

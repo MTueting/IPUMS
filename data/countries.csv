@@ -1,0 +1,105 @@
+country,country_prefix,n_samples,first_year,last_year,iso2,iso3
+Argentina,ar,5,1970,2010,AR,ARG
+Armenia,am,2,2001,2011,AM,ARM
+Austria,at,5,1971,2011,AT,AUT
+Bangladesh,bd,3,1991,2011,BD,BGD
+Belarus,by,2,1999,2009,BY,BLR
+Benin,bj,4,1979,2013,BJ,BEN
+Bolivia,bo,4,1976,2012,BO,BOL
+Botswana,bw,4,1981,2011,BW,BWA
+Brazil,br,6,1960,2010,BR,BRA
+Burkina Faso,bf,3,1985,2006,BF,BFA
+Cambodia,kh,5,1998,2019,KH,KHM
+Cameroon,cm,3,1976,2005,CM,CMR
+Canada,ca,11,1852,2011,CA,CAN
+Chile,cl,6,1960,2017,CL,CHL
+China,cn,3,1982,2000,CN,CHN
+Colombia,co,5,1964,2005,CO,COL
+Costa Rica,cr,5,1963,2011,CR,CRI
+Cuba,cu,2,2002,2012,CU,CUB
+Côte d'Ivoire,ci,2,1988,1998,CI,CIV
+Denmark,dk,5,1787,1885,DK,DNK
+Dominican Republic,do,5,1960,2010,DO,DOM
+Ecuador,ec,6,1962,2010,EC,ECU
+Egypt,eg,5,1848,2006,EG,EGY
+El Salvador,sv,2,1992,2007,SV,SLV
+Ethiopia,et,3,1984,2007,ET,ETH
+Fiji,fj,6,1966,2014,FJ,FJI
+Finland,fi,1,2010,2010,FI,FIN
+France,fr,8,1962,2011,FR,FRA
+Germany,de,5,1819,1987,DE,DEU
+Ghana,gh,3,1984,2010,GH,GHA
+Greece,gr,5,1971,2011,GR,GRC
+Guatemala,gt,5,1964,2002,GT,GTM
+Guinea,gn,3,1983,2014,GN,GIN
+Haiti,ht,3,1971,2003,HT,HTI
+Honduras,hn,5,1961,2013,HN,HND
+Hungary,hu,5,1970,2011,HU,HUN
+Iceland,is,5,1703,1910,IS,ISL
+India,in,6,1983,2009,IN,IND
+Indonesia,id,9,1971,2010,ID,IDN
+Iran,ir,2,2006,2011,IR,IRN
+Iraq,iq,1,1997,1997,IQ,IRQ
+Ireland,ie,12,1901,2016,IE,IRL
+Israel,il,4,1972,2008,IL,ISR
+Italy,it,12,2001,2020,IT,ITA
+Jamaica,jm,3,1982,2001,JM,JAM
+Jordan,jo,1,2004,2004,JO,JOR
+Kenya,ke,6,1969,2019,KE,KEN
+Kyrgyzstan,kg,2,1999,2009,KG,KGZ
+Laos,la,3,1995,2015,LA,LAO
+Lesotho,ls,2,1996,2006,LS,LSO
+Liberia,lr,2,1974,2008,LR,LBR
+Malawi,mw,4,1987,2018,MW,MWI
+Malaysia,my,4,1970,2000,MY,MYS
+Mali,ml,3,1987,2009,ML,MLI
+Mauritius,mu,3,1990,2011,MU,MUS
+Mexico,mx,71,1960,2020,MX,MEX
+Mongolia,mn,4,1989,2020,MN,MNG
+Morocco,ma,4,1982,2014,MA,MAR
+Mozambique,mz,3,1997,2017,MZ,MOZ
+Myanmar,mm,1,2014,2014,MM,MMR
+Nepal,np,2,2001,2011,NP,NPL
+Netherlands,nl,4,1960,2011,NL,NLD
+Nicaragua,ni,3,1971,2005,NI,NIC
+Nigeria,ng,5,2006,2010,NG,NGA
+Norway,no,5,1801,1910,NO,NOR
+Pakistan,pk,3,1973,1998,PK,PAK
+Palestine,ps,3,1997,2017,PS,PSE
+Panama,pa,6,1960,2010,PA,PAN
+Papua New Guinea,pg,3,1980,2000,PG,PNG
+Paraguay,py,5,1962,2002,PY,PRY
+Peru,pe,3,1993,2017,PE,PER
+Philippines,ph,95,1990,2019,PH,PHL
+Poland,pl,4,1978,2011,PL,POL
+Portugal,pt,4,1981,2011,PT,PRT
+Puerto Rico,pr,8,1970,2020,PR,PRI
+Romania,ro,4,1977,2011,RO,ROU
+Russia,ru,2,2002,2010,RU,RUS
+Rwanda,rw,3,1991,2012,RW,RWA
+Saint Lucia,lc,2,1980,1991,LC,LCA
+Senegal,sn,3,1988,2013,SN,SEN
+Sierra Leone,sl,2,2004,2015,SL,SLE
+Slovakia,sk,3,1991,2011,SK,SVK
+Slovenia,si,1,2002,2002,SI,SVN
+South Africa,za,5,1996,2016,ZA,ZAF
+South Sudan,ss,1,2008,2008,SS,SSD
+Spain,es,68,1981,2020,ES,ESP
+Sudan,sd,1,2008,2008,SD,SDN
+Suriname,sr,2,2004,2012,SR,SUR
+Sweden,se,4,1880,1910,SE,SWE
+Switzerland,ch,5,1970,2011,CH,CHE
+Tanzania,tz,3,1988,2012,TZ,TZA
+Thailand,th,4,1970,2000,TH,THA
+Togo,tg,3,1960,2010,TG,TGO
+Trinidad and Tobago,tt,5,1970,2011,TT,TTO
+Turkey,tr,3,1985,2000,TR,TUR
+Uganda,ug,3,1991,2014,UG,UGA
+Ukraine,ua,1,2001,2001,UA,UKR
+United Kingdom,uk,17,1851,2001,GB,GBR
+United States,us,17,1850,2020,US,USA
+Uruguay,uy,6,1963,2011,UY,URY
+Venezuela,ve,4,1971,2001,VE,VEN
+Vietnam,vn,4,1989,2019,VN,VNM
+Zambia,zm,3,1990,2010,ZM,ZMB
+Zimbabwe,zw,1,2012,2012,ZW,ZWE
