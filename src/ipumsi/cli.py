@@ -1,9 +1,10 @@
 """Command-line interface: ``ipumsi <command>``.
 
-    ipumsi key set IPUMS_API_KEY            save a key (prompts without echo)
-    ipumsi key list                         which keys are set, and from where
+    ipumsi key set IPUMS_API_KEY            save the key (prompts without echo)
+    ipumsi key list                         is the key set, and from where
     ipumsi refresh                          rebuild the catalog from the website
-    ipumsi search migration                 find variables
+    ipumsi find education and fertility     plain-English variable search
+    ipumsi search migration                 keyword search over mnemonics/labels
     ipumsi info GEOMIG1_P                   one variable, with availability
     ipumsi codes EDATTAIN --sample br2010a  case counts per category
     ipumsi coverage GEOMIG1_P INCTOT        country-years carrying all of them
@@ -129,6 +130,38 @@ def cmd_search(args) -> None:
     hits = cat.search(" ".join(args.query), record_type=args.record_type)
     columns = ["variable", "label", "record_type", "n_countries", "n_samples", "group_label"]
     _print(hits[[c for c in columns if c in hits.columns]], args.limit or None, args.csv)
+
+
+def cmd_find(args) -> None:
+    from .search import matched_concepts, search_text, suggest_essentials
+
+    cat = _catalog()
+    query = " ".join(args.query)
+    concepts = matched_concepts(query)
+    if concepts:
+        topics = ", ".join(c.name for c in concepts)
+        print(f"# topics recognised: {topics}\n")
+
+    hits = search_text(
+        cat, query,
+        limit=args.limit or 30,
+        record_type=args.record_type,
+        include_country_specific=args.all_countries,
+    )
+    if hits.empty:
+        print("(nothing matched -- try naming the concept: fertility, education, migration, income)")
+        return
+    if args.ids_only:
+        print(" ".join(hits["variable"]))
+        return
+    columns = ["variable", "label", "why", "record_type", "n_countries", "n_samples"]
+    _print(hits[columns], None, args.csv)
+
+    extras = suggest_essentials(cat, hits["variable"].tolist())
+    if not extras.empty and not args.csv:
+        print("\n# standard variables you will probably also want:", file=sys.stderr)
+        for row in extras.itertuples():
+            print(f"#   {row.variable:9s} {row.reason}", file=sys.stderr)
 
 
 def cmd_info(args) -> None:
@@ -347,7 +380,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--limit-variables", type=int, default=None, help="for smoke tests")
     p.set_defaults(func=cmd_refresh)
 
-    p = sub.add_parser("key", help="manage the IPUMS and Anthropic API keys")
+    p = sub.add_parser("key", help="manage the IPUMS API key")
     sub_key = p.add_subparsers(dest="key_command", required=True)
     kp = sub_key.add_parser("list", help="show which keys are set and where they came from")
     kp.add_argument("--csv", action="store_true")
@@ -369,6 +402,15 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--record-type", choices=["P", "H"])
     _add_output(p)
     p.set_defaults(func=cmd_search)
+
+    p = sub.add_parser("find", help="search variables from a plain-English question")
+    p.add_argument("query", nargs="+")
+    p.add_argument("--record-type", choices=["P", "H"])
+    p.add_argument("--all-countries", action="store_true",
+                   help="also rank single-country recodes normally")
+    p.add_argument("--ids-only", action="store_true")
+    _add_output(p)
+    p.set_defaults(func=cmd_find)
 
     p = sub.add_parser("info", help="show one variable and where it is available")
     p.add_argument("variable")

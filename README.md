@@ -24,7 +24,6 @@ country-years you actually have.
 ```bash
 pip install -e .            # core
 pip install -e ".[app]"     # + Streamlit explorer
-pip install -e ".[assistant]" # + the "Ask Claude" page
 pip install -e ".[dev]"     # + pytest
 ```
 
@@ -80,10 +79,12 @@ started through the `streamlit run` launcher, not by executing the script.
 
 Five pages:
 
-- **Ask Claude** — describe the project in prose; Claude reads the whole catalog
-  and proposes a must-have / nice-to-have split that lands in every other page.
-- **Browse** — search variables, see a country × year availability heatmap, and
-  profile a variable's **case counts** per category for up to three samples.
+- **Find variables** — describe your project in plain English and get ranked
+  variables back, with a plain-English reason for each match. No account, no
+  API, no cost — see "Finding variables" below.
+- **Browse & profile** — search variables, see a country × year availability
+  heatmap, and profile a variable's **case counts** per category for up to
+  three samples.
 - **Coverage** — pick a variable set, see which country-years carry all of it and
   which variable is the binding constraint.
 - **Build extract** — assemble, validate, download the JSON or submit it.
@@ -119,13 +120,37 @@ before the variable ends up in an extract.
 These are pulled on demand rather than committed — one variable can be 100k+
 category × sample cells, which would dwarf the rest of the catalog.
 
-## Ask Claude
+## Finding variables
 
-Optional. `pip install -e ".[assistant]"` and set `ANTHROPIC_API_KEY`. The whole
-variable catalog (~32k tokens) is sent as a *cached* prompt and the reply is
-constrained to a JSON schema, so every mnemonic that comes back is checked
-against the catalog before it reaches the UI — a hallucinated variable is
-dropped and reported, never silently selected.
+Type a research question, get variables. Plain string matching — instant, free,
+offline, deterministic, identical for everyone:
+
+```bash
+ipumsi find I am interested in the role of education on fertility
+```
+```
+# topics recognised: education, fertility
+
+EDATTAIN  Educational attainment       key education variable; in the Education group
+CHBORN    Children ever born           key fertility variable; in the Fertility group
+SCHOOL    School attendance            key education variable; in the Education group
+CHSURV    Children surviving           key fertility variable; in the Fertility group
+```
+
+Three things make this work better than a `LIKE '%...%'` query:
+
+1. **A concept table** maps everyday words onto IPUMS's own vocabulary. This is
+   why "education" finds `YRSCHOOL`, which shares no letters with the word you
+   typed.
+2. **Single-country recodes are demoted.** 1,439 of the 1,709 variables exist in
+   exactly one country — `EDUCUS` is US-only across 9 samples, while `EDATTAIN`
+   spans 98 countries. Unranked, the country-specific ones swamp everything.
+   `--all-countries` turns the demotion off.
+3. **Topics are interleaved.** "education on fertility" is two topics; a flat
+   relevance sort returns ten education variables and no fertility.
+
+Every result says *why* it matched, and the search is whole-token, so `income`
+does not match `SEWAGE` and `PRINCE` the way a substring search does.
 
 ## The one thing worth knowing
 
@@ -164,20 +189,20 @@ harmonised samples a few times a year; re-running quarterly is plenty.
 
 ## API keys
 
-**Nothing in the catalog needs a key.** Search, availability, coverage and case
-counts all work offline. Keys are only used for:
+**Nothing in the catalog needs a key.** Finding variables, availability,
+coverage, case counts and building a request all work offline. One key exists,
+and only for the last step:
 
 | Key | Used for | Get one |
 |---|---|---|
 | `IPUMS_API_KEY` | Submitting extracts and downloading data | <https://account.ipums.org/api_keys> (needs an approved IPUMS International account) |
-| `ANTHROPIC_API_KEY` | The optional "Ask Claude" page | <https://console.anthropic.com/settings/keys> |
 
 ### Easiest: let the app ask
 
-Just use the app. The first time you press **Submit to IPUMS** or **Suggest
-variables**, it offers a box to paste the key into, checks it against the live
-API, and offers to remember it. You can also manage both keys up front on the
-**Settings** page.
+Just use the app. The first time you press **Submit to IPUMS**, a dialog opens
+with a box to paste the key into. It checks the key against the live API before
+saving, and lets you choose where to keep it. You can also set it up front on
+the **Settings** page.
 
 ### From the terminal
 
@@ -194,7 +219,7 @@ First match wins:
 
 1. a key typed into the app this session (never written to disk)
 2. `.streamlit/secrets.toml` — for deployed apps
-3. the `IPUMS_API_KEY` / `ANTHROPIC_API_KEY` environment variables
+3. the `IPUMS_API_KEY` environment variable
 4. a `.env` file in the project folder (`cp .env.example .env`)
 5. `~/.ipumsi/credentials.json` — what the app and `ipumsi key set` write
 
@@ -228,7 +253,7 @@ src/ipumsi/
   http.py         cached, rate-limited scraping session
   countries.py    sample prefix -> ISO 3166 alpha-2/alpha-3
   credentials.py  where API keys live, and checking they work
-  assistant.py    optional: pitch -> variable picks, via Claude
+  search.py       plain-English question -> ranked variables (no model)
   scrape/
     samples.py       the sample-ID table
     variables.py     the 29 variable groups, paginated

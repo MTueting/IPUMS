@@ -102,7 +102,7 @@ CONCEPTS: tuple[Concept, ...] = (
         ("educ", "school", "literac", "literat", "univers", "colleg", "degre",
          "qualif", "learn", "student", "teach", "attain", "grade"),
         groups=("Education",),
-        mnemonics=("EDATTAIN", "EDATTAND", "YRSCHOOL", "SCHOOL", "LIT", "EDUCUS"),
+        mnemonics=("EDATTAIN", "YRSCHOOL", "SCHOOL", "LIT", "EDATTAND"),
         fragments=("EDUC", "SCHOOL", "YRSCH", "LIT", "EDAT"),
     ),
     Concept(
@@ -210,14 +210,14 @@ CONCEPTS: tuple[Concept, ...] = (
 
 # Variables that almost every analysis needs but nobody types into a search box.
 ESSENTIALS: dict[str, str] = {
-    "PERWT": "Person weight — needed for any population-representative estimate.",
-    "HHWT": "Household weight — the household-level equivalent.",
+    "PERWT": "Person weight - needed for any population-representative estimate.",
+    "HHWT": "Household weight - the household-level equivalent.",
     "YEAR": "Census year.",
     "SAMPLE": "IPUMS sample identifier.",
     "SERIAL": "Household identifier, for linking person and household records.",
     "GEOLEV1": "First subnational unit, harmonised across countries.",
-    "AGE": "Age — almost always a control.",
-    "SEX": "Sex — almost always a control.",
+    "AGE": "Age - almost always a control.",
+    "SEX": "Sex - almost always a control.",
 }
 
 
@@ -229,11 +229,30 @@ class Match:
     record_type: str
     n_samples: int
     score: float
+    n_countries: int = 0
     why: list[str] = field(default_factory=list)
+    concept: str = ""
 
 
 def _label_tokens(text: str) -> set[str]:
     return {stem(w) for w in re.findall(r"[a-z]+", (text or "").lower()) if len(w) >= 3}
+
+
+def _matches(token: str, tokens: set[str]) -> bool:
+    """Prefix-tolerant stem comparison.
+
+    Suffix stripping is not perfectly consistent -- "fertility" reduces to
+    "fertil" but "fertile" stays whole -- so exact equality would miss obvious
+    matches. Comparing on a shared prefix of at least four characters keeps
+    those together without letting "age" match "agency".
+    """
+    if token in tokens:
+        return True
+    return any(
+        len(other) >= 4 and len(token) >= 4
+        and (other.startswith(token) or token.startswith(other))
+        for other in tokens
+    )
 
 
 def matched_concepts(query: str) -> list[Concept]:
@@ -253,8 +272,22 @@ def search_text(
     query: str,
     limit: int = 40,
     record_type: str | None = None,
+    include_country_specific: bool = False,
 ) -> pd.DataFrame:
-    """Rank catalog variables against a free-text research question."""
+    """Rank catalog variables against a free-text research question.
+
+    Two things stop the ranking being a naive relevance sort:
+
+    * **Country-specific recodes are demoted.** 1,439 of the 1,709 variables
+      exist in exactly one country (``EDUCUS`` is US-only, 9 samples), and they
+      otherwise swamp the harmonised ones that make cross-country work possible
+      (``EDATTAIN``, 98 countries). Set ``include_country_specific`` to rank them
+      normally.
+    * **Concepts are interleaved.** "education on fertility" is two topics, and a
+      flat sort returns ten education variables and no fertility. Results are
+      taken round-robin per concept so every topic in the question is
+      represented.
+    """
     stems = tokenize(query)
     concepts = matched_concepts(query)
     if not stems and not concepts:
@@ -284,19 +317,24 @@ def search_text(
         score = 0.0
         why: list[str] = []
         mnemonic = row.variable
+        primary_concept = ""
 
         # 1. Concepts.
         if mnemonic in concept_mnemonics:
             score += 12
-            why.append(f"key {'/'.join(concept_mnemonics[mnemonic])} variable")
+            names = concept_mnemonics[mnemonic]
+            primary_concept = names[0]
+            why.append(f"key {'/'.join(names)} variable")
         else:
             for fragment, names in concept_fragments.items():
                 if mnemonic.startswith(fragment):
                     score += 5
+                    primary_concept = primary_concept or names[0]
                     why.append(f"{'/'.join(names)} variable")
                     break
         if row.group_label in concept_groups:
             score += 6
+            primary_concept = primary_concept or concept_groups[row.group_label][0]
             why.append(f"in the {row.group_label} group")
 
         # 2. Mnemonic and label text.
@@ -306,7 +344,7 @@ def search_text(
             if mnemonic_stem.startswith(token) or token.startswith(mnemonic.lower()):
                 score += 8
                 why.append(f"name matches '{token}'")
-            elif token in label_tokens:
+            elif _matches(token, label_tokens):
                 score += 5
                 why.append(f"label mentions '{token}'")
 
@@ -314,15 +352,31 @@ def search_text(
         description = getattr(row, "description", "") or ""
         if description and score:
             description_tokens = _label_tokens(description[:600])
-            overlap = [t for t in stems if t in description_tokens]
+            overlap = [t for t in stems if _matches(t, description_tokens)]
             if overlap:
                 score += min(len(overlap), 3)
                 why.append("described in these terms")
 
         if score <= 0:
             continue
+
         # Nudge widely-available variables up; never let this outrank relevance.
         score += 2.0 * (int(row.n_samples) / max_samples)
+
+        # Technical variables (PERNUM, SERIAL, ...) are auto-included in every
+        # extract anyway, and they match words like "person" that appear in
+        # almost any research question. Keep them findable, out of the way.
+        if (row.group_label or "").startswith("Technical"):
+            score *= 0.5
+            why.append("technical variable, added automatically")
+
+        n_countries = int(getattr(row, "n_countries", 0) or 0)
+        country_specific = n_countries <= 1
+        if country_specific:
+            if not include_country_specific:
+                score *= 0.45
+            why.append("single-country recode")
+
         matches.append(
             Match(
                 variable=mnemonic,
@@ -330,12 +384,15 @@ def search_text(
                 group=row.group_label or "",
                 record_type=row.record_type or "",
                 n_samples=int(row.n_samples),
+                n_countries=n_countries,
                 score=round(score, 2),
                 why=list(dict.fromkeys(why))[:3],
+                concept=primary_concept or "",
             )
         )
 
     matches.sort(key=lambda m: (-m.score, -m.n_samples, m.variable))
+    ordered = _interleave(matches, limit) if len(concepts) > 1 else matches[:limit]
     return pd.DataFrame(
         [
             {
@@ -343,13 +400,29 @@ def search_text(
                 "label": m.label,
                 "group_label": m.group,
                 "record_type": m.record_type,
+                "n_countries": m.n_countries,
                 "n_samples": m.n_samples,
                 "score": m.score,
                 "why": "; ".join(m.why),
+                "topic": m.concept,
             }
-            for m in matches[:limit]
+            for m in ordered
         ]
     )
+
+
+def _interleave(matches: list["Match"], limit: int) -> list["Match"]:
+    """Take results round-robin per topic so no one topic swamps the rest."""
+    by_concept: dict[str, list[Match]] = {}
+    for match in matches:
+        by_concept.setdefault(match.concept, []).append(match)
+
+    out: list[Match] = []
+    while len(out) < limit and any(by_concept.values()):
+        for bucket in by_concept.values():
+            if bucket and len(out) < limit:
+                out.append(bucket.pop(0))
+    return out
 
 
 def suggest_essentials(catalog, picked: list[str]) -> pd.DataFrame:

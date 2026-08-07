@@ -130,13 +130,12 @@ with st.expander("Or refresh from the command line"):
         "not depend on this page staying open."
     )
 
-st.subheader("API keys")
+st.subheader("IPUMS API key")
 st.caption(
-    "Neither key is needed to browse the catalog — they are only used when you "
-    "submit an extract or ask Claude for suggestions."
+    "Not needed to search, browse or plan — only to submit an extract and "
+    "download the data."
 )
-for key_name in ("IPUMS_API_KEY", "ANTHROPIC_API_KEY"):
-    key_status_panel(key_name)
+key_status_panel("IPUMS_API_KEY")
 
 with st.expander("Other ways to set a key"):
     st.markdown(
@@ -144,7 +143,7 @@ with st.expander("Other ways to set a key"):
 
 1. a key you typed in this session
 2. `.streamlit/secrets.toml` (for deployed apps)
-3. the `IPUMS_API_KEY` / `ANTHROPIC_API_KEY` environment variables
+3. the `IPUMS_API_KEY` environment variable
 4. a `.env` file in the project folder (copy `.env.example` to `.env`)
 5. `{CREDENTIALS_FILE}` — what the buttons above write
 

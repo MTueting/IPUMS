@@ -17,7 +17,6 @@ def creds(tmp_path, monkeypatch):
     """A credentials module pointed at a throwaway config dir and repo root."""
     monkeypatch.setenv("IPUMSI_CONFIG_DIR", str(tmp_path / "config"))
     monkeypatch.delenv("IPUMS_API_KEY", raising=False)
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
 
     from ipumsi import credentials
 
@@ -82,21 +81,6 @@ def test_dotenv_handles_quotes_and_other_lines(creds):
     assert creds.find_key("IPUMS_API_KEY")[0] == "quoted-key"
 
 
-def test_legacy_dotfile_still_read(creds):
-    legacy = creds.SPECS["ANTHROPIC_API_KEY"].legacy_path
-    legacy.write_text("sk-ant-legacy\n", encoding="utf-8")
-    key, source = creds.find_key("ANTHROPIC_API_KEY")
-    assert key == "sk-ant-legacy"
-    assert str(legacy) in source
-
-
-def test_keys_are_independent(creds):
-    creds.save_key("IPUMS_API_KEY", "ipums")
-    creds.save_key("ANTHROPIC_API_KEY", "sk-ant-x")
-    assert creds.find_key("IPUMS_API_KEY")[0] == "ipums"
-    assert creds.find_key("ANTHROPIC_API_KEY")[0] == "sk-ant-x"
-    creds.delete_key("IPUMS_API_KEY")
-    assert creds.find_key("ANTHROPIC_API_KEY")[0] == "sk-ant-x"
 
 
 def test_rejects_unknown_names_and_empty_values(creds):
@@ -116,13 +100,34 @@ def test_mask_is_ascii_and_hides_the_middle(creds):
     assert creds.mask("short") == "*****"
 
 
-def test_anthropic_prefix_is_checked_before_any_network_call(creds):
-    ok, message = creds.verify_key("ANTHROPIC_API_KEY", "not-an-anthropic-key")
-    assert ok is False
-    assert "sk-ant-" in message
-
 
 def test_empty_key_never_verifies(creds):
     for name in creds.SPECS:
         ok, _ = creds.verify_key(name, "   ")
         assert ok is False
+
+
+def test_legacy_dotfile_still_read(creds):
+    legacy = creds.SPECS["IPUMS_API_KEY"].legacy_path
+    legacy.write_text("legacy-key\n", encoding="utf-8")
+    key, source = creds.find_key("IPUMS_API_KEY")
+    assert key == "legacy-key"
+    assert str(legacy) in source
+
+
+def test_write_dotenv_replaces_not_appends(creds):
+    dotenv = creds.ROOT / ".env"
+    dotenv.write_text("OTHER=keep\nIPUMS_API_KEY=old\n", encoding="utf-8")
+
+    creds.write_dotenv("IPUMS_API_KEY", "new")
+
+    lines = dotenv.read_text(encoding="utf-8").splitlines()
+    assert "OTHER=keep" in lines
+    assert lines.count("IPUMS_API_KEY=new") == 1
+    assert "IPUMS_API_KEY=old" not in lines
+    assert creds.find_key("IPUMS_API_KEY")[0] == "new"
+
+
+def test_write_dotenv_creates_the_file(creds):
+    path = creds.write_dotenv("IPUMS_API_KEY", "fresh")
+    assert path.read_text(encoding="utf-8").strip() == "IPUMS_API_KEY=fresh"

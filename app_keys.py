@@ -1,8 +1,8 @@
 """In-app API key entry.
 
 Nothing in the catalog needs a key, so the app never blocks on one. A key is
-asked for at the moment it is actually required — pressing "Submit to IPUMS" or
-"Suggest variables" — and the dialog explains what that specific key unlocks.
+asked for at the moment it is actually required — pressing "Submit to IPUMS" —
+and the dialog explains what that key unlocks.
 
 Two ways to keep it:
 
