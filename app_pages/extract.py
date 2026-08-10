@@ -140,6 +140,6 @@ if submit or resume_after_key("IPUMS_API_KEY"):
             number = result.get("number")
             st.success(f"Submitted as extract {number} ({result.get('status')}).")
             st.caption(
-                f"IPUMS processes international extracts in minutes to hours. Check with "
-                f"`ipumsi status {number}`, then `ipumsi download {number}`."
+                "IPUMS processes international extracts in minutes to hours. "
+                "The **Downloads** page lists it and fetches the files when ready."
             )

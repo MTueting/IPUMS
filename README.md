@@ -52,6 +52,32 @@ ipumsi plan GEOMIG1_P INCTOT EDATTAIN AGE SEX --year-min 1990 -o request.json
 ipumsi submit request.json --wait
 ```
 
+## Getting the data back
+
+Submitting only *queues* the job — IPUMS takes minutes to hours to build an
+extract. Downloading is a separate step, in the app's **Downloads** page or on
+the command line:
+
+```bash
+ipumsi status              # your recent extracts and their status
+ipumsi download 99         # data + DDI codebook
+ipumsi download 99 --wait  # poll until ready, then fetch
+ipumsi download 99 --which all   # also the codebooks and command files
+```
+
+Files land in `extracts/ipumsi_00099/`, one folder per extract, streamed to disk
+and checksum-verified. `extracts/` is gitignored. Set `IPUMSI_EXTRACT_DIR` to put
+them somewhere else — a single extract can be hundreds of megabytes, so that is
+worth doing if you would rather they stayed off a synced folder.
+
+Two things about IPUMS's own behaviour that the UI makes explicit:
+
+- A **completed** extract is not necessarily downloadable. IPUMS keeps the
+  extract *record* indefinitely but removes the *files* after a while, so an old
+  extract shows as completed with nothing to fetch. It has to be resubmitted.
+- Which files exist depends on the data format you asked for; a CSV extract
+  offers `data`, `ddiCodebook`, `basicCodebook` and `stsCommandFile`.
+
 From Python:
 
 ```python
@@ -88,7 +114,11 @@ Five pages:
 - **Coverage** — pick a variable set, see which country-years carry all of it and
   which variable is the binding constraint.
 - **Build extract** — assemble, validate, download the JSON or submit it.
-- **Settings** — catalog stats and a one-click refresh with live progress.
+- **Downloads** — your recent extracts, with their status, and a button to
+  fetch the finished ones.
+- **Country plots** — a weighted country × year measure from your downloaded
+  microdata, plotted against World Bank GDP per capita or a second measure.
+- **Settings** — catalog stats, the API key, and a one-click catalog refresh.
 
 A worked end-to-end example — internal migration by income, including what each
 income measure costs in coverage — is in `examples/internal_migration.py`.
@@ -152,6 +182,63 @@ Three things make this work better than a `LIKE '%...%'` query:
 Every result says *why* it matched, and the search is whole-token, so `income`
 does not match `SEWAGE` and `PRINCE` the way a substring search does.
 
+## Country-level plots
+
+Once an extract is downloaded, the **Country plots** page turns it into
+country × year estimates and puts them against a World Bank indicator:
+
+```
+y: weighted share of EDATTAIN in {Secondary completed, University completed}
+x: log GDP per capita, PPP (constant 2021 international $)
+
+40 country-years, 11 countries, correlation 0.647
+India 1999   13.4%  at $2,954        Switzerland 2011  73.8%  at $76,527
+```
+
+```python
+from ipumsi import Catalog
+from ipumsi.microdata import find_extracts, Measure, aggregate, add_iso3
+from ipumsi.worldbank import attach
+
+extract = find_extracts()[0]
+share = Measure("EDATTAIN", "share", categories=(3, 4), exclude=(0, 9), weight="PERWT")
+panel = add_iso3(aggregate(extract, share), Catalog.load())
+panel = attach(panel, "NY.GDP.PCAP.PP.KD", column="gdp_pc")
+```
+
+Each country gets its own colour **and** marker shape, with a legend, so a
+country can be traced across its census years; "Highlight one" greys the rest
+when that matters. Axis limits can be set by hand, and the linear fit toggles.
+
+Colour deserves a caveat: a scatter puts every pair of points side by side, and
+the reference palette only guarantees separation for three hues under those
+conditions (measured worst-case OKLab ΔE across twelve hues here is 7.1, against
+a floor of 15). So with a dozen countries some colours genuinely do sit close —
+which is why shape varies too, points are labelled when few enough, and every
+point has a tooltip. Identity never rests on colour alone.
+
+Four things this gets right, because getting them wrong is easy and quiet:
+
+- **Weights are not optional.** IPUMS samples are not self-weighting, so an
+  unweighted share estimates nothing. `PERWT` (or `HHWT`) is applied throughout,
+  and every point carries the unweighted case count behind it — point size on the
+  chart — so a country-year resting on a handful of observations looks like one.
+- **Not-in-universe and unknown codes sit outside both** the numerator and the
+  denominator, and are pre-selected for exclusion. Leaving them in the
+  denominator silently deflates every share.
+- **Nothing is loaded into memory.** A real extract is large — the one used
+  above is 47 million rows — so aggregation streams in chunks. There is a test
+  that the answer is identical at every chunk size, because a per-chunk
+  accumulation bug would produce plausible-looking economics rather than an error.
+- **The World Bank join is exact on `(iso3, year)`.** No interpolation and no
+  nearest-year snapping, so census years the WDI does not cover come back empty
+  instead of quietly invented. The page reports how many were dropped.
+
+Codes and labels come from the DDI codebook that ships with the extract, so
+country and category names are the extract's own rather than a table here that
+could drift. Series are cached under `data/worldbank/`; any WDI indicator code
+works, with ten common ones offered up front.
+
 ## The one thing worth knowing
 
 `samples_with(..., how="all")` is the query that matters. An analysis is only
@@ -170,6 +257,7 @@ tells you exactly which variable × sample pairs would come back empty.
 | `data/availability.parquet` | ~350k | the raw `(variable, country, token)` scrape, pre-resolution |
 | `data/countries.csv` | ~101 | country → ISO2/ISO3 (the join key for World Bank data) |
 | `data/catalog_meta.json` | — | scrape timestamp and row counts |
+| `data/worldbank/*.csv` | ~8.5k each | cached WDI series, `(iso3, year, value)` |
 
 Case counts are deliberately *not* in this table — see "Case counts" above.
 
@@ -252,6 +340,8 @@ src/ipumsi/
   cli.py          the `ipumsi` command
   http.py         cached, rate-limited scraping session
   countries.py    sample prefix -> ISO 3166 alpha-2/alpha-3
+  microdata.py    downloaded extract -> weighted country x year measures
+  worldbank.py    WDI indicators, joined on (iso3, year)
   credentials.py  where API keys live, and checking they work
   search.py       plain-English question -> ranked variables (no model)
   scrape/
@@ -261,6 +351,7 @@ src/ipumsi/
     frequencies.py   per-category case counts (on demand)
     build.py         orchestration; writes data/
 streamlit_app.py + app_pages/    the explorer
+app_shared.py                    cached loaders, charts, sticky widgets
 app_keys.py                      in-app key entry dialog
 tests/                           parser + query tests
 ```

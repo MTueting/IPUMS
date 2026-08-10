@@ -21,6 +21,8 @@ page = st.navigation(
         st.Page("app_pages/browse.py", title="Browse & profile", icon=":material/table_rows:"),
         st.Page("app_pages/coverage.py", title="Coverage", icon=":material/grid_on:"),
         st.Page("app_pages/extract.py", title="Build extract", icon=":material/download:"),
+        st.Page("app_pages/downloads.py", title="Downloads", icon=":material/cloud_download:"),
+        st.Page("app_pages/compare.py", title="Country plots", icon=":material/scatter_plot:"),
         st.Page("app_pages/settings.py", title="Settings", icon=":material/settings:"),
     ],
     position="top",

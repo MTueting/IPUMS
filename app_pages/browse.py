@@ -10,6 +10,7 @@ from app_shared import (
     frequencies,
     frequency_chart,
     get_selection,
+    sticky,
     variable_pickers,
 )
 
@@ -146,7 +147,8 @@ if len(focus) == 1:
             max_selections=3,
             help="Up to three, so the colours stay distinguishable.",
         )
-        top_n = st.slider("Categories shown", 5, 40, 15)
+        top_n = sticky("slider", "Categories shown", "brw_topn",
+                       default=15, min_value=5, max_value=40)
 
     if not chosen:
         st.info("Pick a sample to see how the variable's categories are distributed.")

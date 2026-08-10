@@ -1,6 +1,6 @@
 import streamlit as st
 
-from app_shared import OPTIONAL, REQUIRED, catalog, init_state, tier_summary
+from app_shared import OPTIONAL, REQUIRED, catalog, init_state, sticky, tier_summary
 from ipumsi.search import matched_concepts, search_text, suggest_essentials, tokenize
 
 cat = catalog()
@@ -22,23 +22,25 @@ EXAMPLES = [
 with st.container(horizontal=True):
     for i, example in enumerate(EXAMPLES):
         if st.button(example, key=f"eg{i}"):
-            st.session_state["query"] = example
+            st.session_state["_keep_query"] = example
+            st.session_state.pop("query", None)
             st.rerun()
 
-query = st.text_input(
-    "What are you interested in?",
-    key="query",
+query = sticky(
+    "text_input", "What are you interested in?", "query",
+    default="",
     placeholder="e.g. I am interested in the role of education on fertility",
 )
 
 with st.container(horizontal=True):
-    record_type = st.segmented_control(
-        "Record type", ["All", "P", "H"], default="All", label_visibility="collapsed"
+    record_type = sticky(
+        "segmented_control", "Record type", "find_rt",
+        options=["All", "P", "H"], default="All", label_visibility="collapsed",
     )
-    limit = st.slider("Results", 10, 100, 30)
-    include_country = st.toggle(
-        "Include single-country variables",
-        value=False,
+    limit = sticky("slider", "Results", "find_limit", default=30,
+                   min_value=10, max_value=100)
+    include_country = sticky(
+        "toggle", "Include single-country variables", "find_allc", default=False,
         help=(
             "1,439 of the 1,709 variables exist in only one country (EDUCUS is "
             "US-only). They are ranked below the harmonised ones unless you turn "

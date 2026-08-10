@@ -87,6 +87,42 @@ class IpumsClient:
             return result.get("data", [])
         return result or []
 
+    def recent(self, limit: int = 25) -> list[dict]:
+        """Recent extracts, flattened into something a table can render.
+
+        Note the two different meanings of "completed": IPUMS keeps the extract
+        record forever but removes the files after a while, so a completed
+        extract with no ``downloadLinks`` cannot be downloaded -- it has to be
+        resubmitted. ``downloadable`` is the flag that actually matters.
+        """
+        out = []
+        for entry in self.list_extracts(limit=limit):
+            definition = entry.get("extractDefinition") or {}
+            links = entry.get("downloadLinks") or {}
+            data = links.get("data") or {}
+            out.append(
+                {
+                    "number": entry.get("number"),
+                    "status": entry.get("status"),
+                    "description": definition.get("description") or "",
+                    "n_samples": len(definition.get("samples") or {}),
+                    "n_variables": len(definition.get("variables") or {}),
+                    "data_format": definition.get("dataFormat"),
+                    "bytes": int(data.get("bytes") or 0),
+                    "files": sorted(links),
+                    "downloadable": bool(links),
+                    "expired": entry.get("status") == "completed" and not links,
+                }
+            )
+        return out
+
+    def local_files(self, number: int, dest: str | Path | None = None) -> list[Path]:
+        """Files already downloaded for this extract, if any."""
+        folder = Path(dest or EXTRACT_DIR) / f"{self.collection}_{number:05d}"
+        if not folder.is_dir():
+            return []
+        return sorted(p for p in folder.iterdir() if p.is_file() and p.suffix != ".part")
+
     def wait(
         self,
         number: int,
@@ -121,12 +157,18 @@ class IpumsClient:
         dest: str | Path | None = None,
         which: Iterable[str] = ("data", "ddiCodebook"),
         overwrite: bool = False,
+        on_progress=None,
     ) -> list[Path]:
         """Download files from a completed extract.
 
-        ``which`` names keys of the API's ``downloadLinks`` object -- ``data``,
-        ``ddiCodebook``, ``basicCodebook``, ``stataCommandFile``, ``rCommandFile``,
-        ``sasCommandFile``, ``spssCommandFile``. Pass ``which="all"`` for everything.
+        ``which`` names keys of the API's ``downloadLinks`` object. Which keys
+        exist depends on the request's ``dataFormat`` -- a CSV extract offers
+        ``data``, ``ddiCodebook``, ``basicCodebook`` and ``stsCommandFile``.
+        Pass ``which="all"`` for whatever the extract actually has.
+
+        ``on_progress(name, downloaded_bytes, total_bytes)`` is called as each
+        file streams; data files run to hundreds of megabytes, so a caller with
+        a UI needs to be able to show something.
         """
         info = self.status(number)
         if info.get("status") != "completed":
@@ -134,6 +176,14 @@ class IpumsClient:
                 f"extract {number} is {info.get('status')!r}, not completed", body=info
             )
         links = info.get("downloadLinks", {})
+        if not links:
+            # IPUMS removes the files after a while; the extract stays "completed".
+            raise IpumsAPIError(
+                f"extract {number} is completed but its files are no longer on the "
+                "IPUMS servers (they expire after a period). Resubmit the request "
+                "to regenerate it.",
+                body=info,
+            )
         keys = list(links) if which == "all" else [k for k in which if k in links]
         skipped = [k for k in (which if which != "all" else []) if k not in links]
         if skipped:
@@ -153,14 +203,23 @@ class IpumsClient:
                 written.append(path)
                 continue
 
-            log.info("downloading %s (%s bytes)", path.name, link.get("bytes"))
+            total = int(link.get("bytes") or 0)
+            log.info("downloading %s (%s bytes)", path.name, total)
             with self.session.get(url, stream=True, timeout=self.timeout) as response:
                 response.raise_for_status()
                 digest = hashlib.sha256()
-                with open(path, "wb") as fh:
+                done = 0
+                # Write to a .part file so an interrupted download can never be
+                # mistaken for a complete one on the next run.
+                partial = path.with_suffix(path.suffix + ".part")
+                with open(partial, "wb") as fh:
                     for chunk in response.iter_content(chunk_size=1 << 20):
                         fh.write(chunk)
                         digest.update(chunk)
+                        done += len(chunk)
+                        if on_progress:
+                            on_progress(path.name, done, total)
+                partial.replace(path)
             expected = link.get("sha256")
             if expected and digest.hexdigest() != expected:
                 path.unlink(missing_ok=True)

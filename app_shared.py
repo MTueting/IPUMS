@@ -90,6 +90,43 @@ def init_state() -> None:
         st.session_state.setdefault(key, [])
 
 
+# --------------------------------------------------------------- sticky widgets
+#
+# Streamlit throws away the state of any widget that was not rendered on the
+# current run, so every control on a page is reset the moment you navigate away
+# and back. These wrappers mirror each widget's value into a plain session-state
+# key (never culled) and re-seed the widget from it, so a page you return to
+# looks the way you left it.
+
+
+def _remember(key: str) -> None:
+    st.session_state[f"_keep_{key}"] = st.session_state[key]
+
+
+def sticky(kind: str, label: str, key: str, *, options=None, default=None, **kwargs):
+    """Render ``st.<kind>`` with a value that survives page switches."""
+    store = f"_keep_{key}"
+    if store not in st.session_state:
+        st.session_state[store] = default
+    kept = st.session_state[store]
+    widget = getattr(st, kind)
+    common = {"key": key, "on_change": _remember, "args": (key,), **kwargs}
+
+    if kind in ("selectbox", "radio"):
+        choices = list(options)
+        index = choices.index(kept) if kept in choices else 0
+        return widget(label, choices, index=index, **common)
+    if kind == "multiselect":
+        allowed = set(options)
+        return widget(
+            label, options, default=[v for v in (kept or []) if v in allowed], **common
+        )
+    if kind in ("segmented_control", "pills"):
+        return widget(label, options, default=kept, **common)
+    # value-based: checkbox, toggle, number_input, slider, text_input, text_area
+    return widget(label, value=kept, **common)
+
+
 def get_selection() -> tuple[list[str], list[str]]:
     init_state()
     return list(st.session_state[REQUIRED]), list(st.session_state[OPTIONAL])
@@ -161,22 +198,22 @@ def variable_pickers(cat: Catalog, page: str, show_optional: bool = True):
 def sample_filters(cat: Catalog, prefix: str) -> dict:
     """The country / year / sample-kind filter row shared by pages."""
     with st.container(horizontal=True):
-        countries = st.multiselect(
-            "Countries",
-            sorted(cat.samples["country"].dropna().unique()),
-            key=f"{prefix}_countries",
-            placeholder="All countries",
+        countries = sticky(
+            "multiselect", "Countries", f"{prefix}_countries",
+            options=sorted(cat.samples["country"].dropna().unique()),
+            default=[], placeholder="All countries",
         )
-        kind = st.segmented_control(
-            "Sample kind",
-            ["All", "census", "LFS"],
-            default="All",
-            key=f"{prefix}_kind",
+        kind = sticky(
+            "segmented_control", "Sample kind", f"{prefix}_kind",
+            options=["All", "census", "LFS"], default="All",
         )
     years = cat.samples["year"].dropna()
     lo, hi = int(years.min()), int(years.max())
     # Default to the full span -- a narrower default would silently hide samples.
-    year_range = st.slider("Year range", lo, hi, (lo, hi), key=f"{prefix}_years")
+    year_range = sticky(
+        "slider", "Year range", f"{prefix}_years",
+        default=(lo, hi), min_value=lo, max_value=hi,
+    )
     return {
         "countries": countries or None,
         "kind": None if kind in (None, "All") else kind,
@@ -257,6 +294,129 @@ def frequency_chart(data: pd.DataFrame, samples: list[str], top_n: int):
         .configure_axis(grid=False, domainColor=grey, tickColor=grey)
         .configure_view(stroke=None)
     )
+
+
+# The eight reference hues, then four more for datasets with more countries.
+# Measured worst-case pairwise separation (OKLab dE x100, normal vision): 7.1 --
+# below the documented floor of 15. That floor is unreachable here: in a scatter
+# any two points can end up adjacent, and the reference palette itself only
+# clears all-pairs for its first three slots. So colour is never the only
+# identity channel below -- shape varies with it, the legend is always drawn,
+# points are labelled when few enough, and every point has a tooltip.
+SERIES_HUES = {
+    "light": ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300",
+              "#4a3aa7", "#e34948", "#8a5a2b", "#00707f", "#b0006e", "#6b7a00"],
+    "dark": ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300",
+             "#9085e9", "#e66767", "#a06a35", "#00899b", "#d4308c", "#8a9c00"],
+}
+SERIES_SHAPES = ["circle", "square", "triangle-up", "diamond", "cross",
+                 "triangle-down", "triangle-right", "triangle-left"]
+
+
+def scatter_chart(
+    data: pd.DataFrame,
+    x_label: str,
+    y_label: str,
+    show_fit: bool = True,
+    colour_by_country: bool = True,
+    x_domain: tuple[float, float] | None = None,
+    y_domain: tuple[float, float] | None = None,
+    highlight: str | None = None,
+):
+    """Country-year scatter.
+
+    Countries get their own colour *and* shape, plus a legend, so a country can
+    be traced across its census years. ``highlight`` greys everything except one
+    country, which is the only fully reliable way to follow a single series when
+    there are many.
+    """
+    grey = AXIS_GREY[_mode()]
+    hues = SERIES_HUES[_mode()]
+    countries = sorted(data["country"].unique())
+    base = alt.Chart(data)
+
+    x_scale = alt.Scale(zero=False, **({"domain": list(x_domain)} if x_domain else {}))
+    y_scale = alt.Scale(zero=False, **({"domain": list(y_domain)} if y_domain else {}))
+
+    encoding = {
+        "x": alt.X("x_plot:Q", title=x_label, scale=x_scale),
+        "y": alt.Y("y:Q", title=y_label, scale=y_scale),
+        "size": alt.Size("n_y:Q", legend=None, scale=alt.Scale(range=[60, 420])),
+        "tooltip": [
+            alt.Tooltip("country", title="Country"),
+            alt.Tooltip("year", title="Year"),
+            alt.Tooltip("y:Q", title="y", format=".4f"),
+            alt.Tooltip("x:Q", title="x", format=",.1f"),
+            alt.Tooltip("n_y:Q", title="Cases", format=","),
+        ],
+    }
+
+    if colour_by_country and len(countries) > 1:
+        # Cycle only if there are more countries than hues; shape keeps those
+        # apart, since it cycles on a different period.
+        colours = [hues[i % len(hues)] for i in range(len(countries))]
+        shapes = [SERIES_SHAPES[i % len(SERIES_SHAPES)] for i in range(len(countries))]
+        encoding["color"] = alt.Color(
+            "country:N",
+            scale=alt.Scale(domain=countries, range=colours),
+            legend=alt.Legend(title="Country", orient="right", symbolLimit=0),
+        )
+        encoding["shape"] = alt.Shape(
+            "country:N",
+            scale=alt.Scale(domain=countries, range=shapes),
+            legend=alt.Legend(title="Country", orient="right", symbolLimit=0),
+        )
+        if highlight and highlight in countries:
+            encoding["opacity"] = alt.condition(
+                alt.datum.country == highlight, alt.value(0.95), alt.value(0.12)
+            )
+        else:
+            encoding["opacity"] = alt.value(0.8)
+        points = base.mark_point(filled=True, strokeWidth=1, stroke="white").encode(**encoding)
+    else:
+        encoding["opacity"] = alt.value(0.75)
+        points = base.mark_point(
+            filled=True, color=hues[0], strokeWidth=1, stroke="white"
+        ).encode(**encoding)
+
+    layers = [points]
+
+    labelled = data if not highlight else data[data["country"] == highlight]
+    if len(labelled) <= 30:
+        layers.append(
+            alt.Chart(labelled)
+            .mark_text(dx=10, dy=-8, align="left", fontSize=10, color=grey)
+            .encode(x=alt.X("x_plot:Q", scale=x_scale), y=alt.Y("y:Q", scale=y_scale),
+                    text="country:N")
+        )
+
+    if show_fit and len(data) >= 3:
+        # One fit across all points -- a per-country fit on a handful of census
+        # years each would be noise dressed up as a finding.
+        layers.append(
+            base.transform_regression("x_plot", "y")
+            .mark_line(color=grey, strokeDash=[5, 4], size=2)
+            .encode(x=alt.X("x_plot:Q", scale=x_scale), y=alt.Y("y:Q", scale=y_scale))
+        )
+
+    return (
+        alt.layer(*layers)
+        .properties(height=480)
+        .configure_axis(grid=True, gridColor=grey, gridOpacity=0.25,
+                        domainColor=grey, tickColor=grey)
+        .configure_view(stroke=None)
+        .configure_legend(labelLimit=180)
+    )
+
+
+def human_bytes(n: int | float) -> str:
+    """Sizes a person can read: extracts run from kilobytes to gigabytes."""
+    size = float(n or 0)
+    for unit in ("B", "KB", "MB", "GB"):
+        if size < 1024 or unit == "GB":
+            return f"{size:.0f} {unit}" if unit == "B" else f"{size:.1f} {unit}"
+        size /= 1024
+    return f"{size:.1f} GB"
 
 
 def tier_summary(required: list[str], optional: list[str]) -> None:
