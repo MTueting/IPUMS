@@ -116,8 +116,9 @@ Five pages:
 - **Build extract** — assemble, validate, download the JSON or submit it.
 - **Downloads** — your recent extracts, with their status, and a button to
   fetch the finished ones.
-- **Country plots** — a weighted country × year measure from your downloaded
-  microdata, plotted against World Bank GDP per capita or a second measure.
+- **Country plots** — a weighted measure from your downloaded microdata plotted
+  against World Bank GDP per capita or a second measure, at whatever unit of
+  analysis you choose.
 - **Settings** — catalog stats, the API key, and a one-click catalog refresh.
 
 A worked end-to-end example — internal migration by income, including what each
@@ -184,8 +185,8 @@ does not match `SEWAGE` and `PRINCE` the way a substring search does.
 
 ## Country-level plots
 
-Once an extract is downloaded, the **Country plots** page turns it into
-country × year estimates and puts them against a World Bank indicator:
+Once an extract is downloaded, the **Country plots** page turns it into weighted
+estimates and puts them against a World Bank indicator:
 
 ```
 y: weighted share of EDATTAIN in {Secondary completed, University completed}
@@ -206,9 +207,19 @@ panel = add_iso3(aggregate(extract, share), Catalog.load())
 panel = attach(panel, "NY.GDP.PCAP.PP.KD", column="gdp_pc")
 ```
 
-Each country gets its own colour **and** marker shape, with a legend, so a
-country can be traced across its census years; "Highlight one" greys the rest
-when that matters. Axis limits can be set by hand, and the linear fit toggles.
+**The unit of analysis is configurable.** Country × year is the default, but any
+categorical variable in the extract can be added as a grouping level — `GEOLEV1`
+for regions within a country, `URBAN` for urban against rural — usually together
+with restricting to one or two countries. Grouping finer never changes the
+weighted totals underneath, which is asserted in the tests.
+
+```python
+aggregate(extract, share, group_by=("COUNTRY", "YEAR", "GEOLEV1"))
+```
+
+Each series gets its own colour **and** marker shape, with a legend, so it can be
+traced across census years; "Highlight one" greys the rest when that matters.
+Axis limits can be set by hand, and the linear fit toggles.
 
 Colour deserves a caveat: a scatter puts every pair of points side by side, and
 the reference palette only guarantees separation for three hues under those

@@ -318,21 +318,25 @@ def scatter_chart(
     x_label: str,
     y_label: str,
     show_fit: bool = True,
-    colour_by_country: bool = True,
+    colour_by_group: bool = True,
     x_domain: tuple[float, float] | None = None,
     y_domain: tuple[float, float] | None = None,
     highlight: str | None = None,
+    legend_title: str = "Series",
 ):
-    """Country-year scatter.
+    """Scatter over whatever the unit of analysis is.
 
-    Countries get their own colour *and* shape, plus a legend, so a country can
-    be traced across its census years. ``highlight`` greys everything except one
-    country, which is the only fully reliable way to follow a single series when
-    there are many.
+    ``data`` needs ``x_plot``, ``y``, ``n_y`` and a ``group`` column naming each
+    series -- a country, or a region within one, depending on how the measure was
+    aggregated. Each group gets its own colour *and* shape, plus a legend, so a
+    series can be traced across years. ``highlight`` greys everything else, which
+    is the only fully reliable way to follow one series when there are many.
     """
     grey = AXIS_GREY[_mode()]
     hues = SERIES_HUES[_mode()]
-    countries = sorted(data["country"].unique())
+    if "group" not in data.columns:
+        data = data.assign(group=data.get("country", "all"))
+    groups = sorted(data["group"].unique())
     base = alt.Chart(data)
 
     x_scale = alt.Scale(zero=False, **({"domain": list(x_domain)} if x_domain else {}))
@@ -343,7 +347,7 @@ def scatter_chart(
         "y": alt.Y("y:Q", title=y_label, scale=y_scale),
         "size": alt.Size("n_y:Q", legend=None, scale=alt.Scale(range=[60, 420])),
         "tooltip": [
-            alt.Tooltip("country", title="Country"),
+            alt.Tooltip("group", title="Series"),
             alt.Tooltip("year", title="Year"),
             alt.Tooltip("y:Q", title="y", format=".4f"),
             alt.Tooltip("x:Q", title="x", format=",.1f"),
@@ -351,24 +355,21 @@ def scatter_chart(
         ],
     }
 
-    if colour_by_country and len(countries) > 1:
-        # Cycle only if there are more countries than hues; shape keeps those
-        # apart, since it cycles on a different period.
-        colours = [hues[i % len(hues)] for i in range(len(countries))]
-        shapes = [SERIES_SHAPES[i % len(SERIES_SHAPES)] for i in range(len(countries))]
+    if colour_by_group and len(groups) > 1:
+        # Cycle only if there are more groups than hues; shape keeps those apart,
+        # since it cycles on a different period.
+        colours = [hues[i % len(hues)] for i in range(len(groups))]
+        shapes = [SERIES_SHAPES[i % len(SERIES_SHAPES)] for i in range(len(groups))]
+        legend = alt.Legend(title=legend_title, orient="right", symbolLimit=0)
         encoding["color"] = alt.Color(
-            "country:N",
-            scale=alt.Scale(domain=countries, range=colours),
-            legend=alt.Legend(title="Country", orient="right", symbolLimit=0),
+            "group:N", scale=alt.Scale(domain=groups, range=colours), legend=legend
         )
         encoding["shape"] = alt.Shape(
-            "country:N",
-            scale=alt.Scale(domain=countries, range=shapes),
-            legend=alt.Legend(title="Country", orient="right", symbolLimit=0),
+            "group:N", scale=alt.Scale(domain=groups, range=shapes), legend=legend
         )
-        if highlight and highlight in countries:
+        if highlight and highlight in groups:
             encoding["opacity"] = alt.condition(
-                alt.datum.country == highlight, alt.value(0.95), alt.value(0.12)
+                alt.datum.group == highlight, alt.value(0.95), alt.value(0.12)
             )
         else:
             encoding["opacity"] = alt.value(0.8)
@@ -381,13 +382,13 @@ def scatter_chart(
 
     layers = [points]
 
-    labelled = data if not highlight else data[data["country"] == highlight]
+    labelled = data if not highlight else data[data["group"] == highlight]
     if len(labelled) <= 30:
         layers.append(
             alt.Chart(labelled)
             .mark_text(dx=10, dy=-8, align="left", fontSize=10, color=grey)
             .encode(x=alt.X("x_plot:Q", scale=x_scale), y=alt.Y("y:Q", scale=y_scale),
-                    text="country:N")
+                    text="group:N")
         )
 
     if show_fit and len(data) >= 3:

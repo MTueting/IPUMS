@@ -156,3 +156,92 @@ def test_find_extracts_reads_a_folder(extract, tmp_path):
     assert [e.number for e in found] == [1]
     assert found[0].labels_for("COUNTRY")[484] == "Mexico"
     assert "EDATTAIN" in found[0].columns
+
+
+# -------------------------------------------------------------- grouping
+
+
+def test_group_by_a_third_column_splits_the_rows(extract):
+    """The unit of analysis is configurable, not fixed at country x year."""
+    df = aggregate(
+        extract,
+        Measure("EDATTAIN", "share", categories=(3,), exclude=(0, 9), weight="PERWT"),
+        group_by=("COUNTRY", "YEAR", "AGE"),
+    )
+    # Brazil 2010 had four in-universe rows at four distinct ages.
+    brazil = df[df["country"] == "Brazil"]
+    assert len(brazil) == 4
+    assert set(brazil["AGE"]) == {20, 30, 40, 50}
+    # Each age group is one person, so the share is 0 or 1.
+    assert set(brazil["value"]) == {0.0, 1.0}
+
+
+def test_country_year_totals_are_recovered_by_summing_groups(extract):
+    """Grouping finer must not change the weighted totals underneath."""
+    coarse = aggregate(
+        extract, Measure("EDATTAIN", "share", categories=(3,), exclude=(0, 9)),
+    ).set_index("country")
+    fine = aggregate(
+        extract, Measure("EDATTAIN", "share", categories=(3,), exclude=(0, 9)),
+        group_by=("COUNTRY", "YEAR", "AGE"),
+    )
+    rolled = fine.groupby("country").agg(
+        weighted_n=("weighted_n", "sum"), n=("n", "sum")
+    )
+    assert rolled.loc["Brazil", "weighted_n"] == pytest.approx(
+        coarse.loc["Brazil", "weighted_n"]
+    )
+    assert rolled.loc["Brazil", "n"] == coarse.loc["Brazil", "n"]
+
+
+def test_subset_restricts_to_chosen_codes(extract):
+    df = aggregate(
+        extract,
+        Measure("EDATTAIN", "share", categories=(3,), exclude=(0, 9),
+                weight="PERWT", subset={"COUNTRY": (484,)}),
+    )
+    assert list(df["country"]) == ["Mexico"]
+
+
+def test_group_labels_come_from_the_codebook(extract):
+    df = aggregate(
+        extract,
+        Measure("EDATTAIN", "share", categories=(3,), exclude=(0, 9)),
+        group_by=("COUNTRY", "YEAR", "EDATTAIN"),
+    )
+    assert "EDATTAIN_label" in df.columns
+    assert set(df["EDATTAIN_label"]) <= {"Less than primary completed", "Secondary completed"}
+
+
+def test_group_label_joins_the_parts_and_drops_year(extract):
+    from ipumsi.microdata import group_label
+
+    df = aggregate(
+        extract,
+        Measure("EDATTAIN", "share", categories=(3,), exclude=(0, 9)),
+        group_by=("COUNTRY", "YEAR", "EDATTAIN"),
+    )
+    labels = group_label(df, ("COUNTRY", "YEAR", "EDATTAIN"))
+    assert all(" · " in text for text in labels)
+    assert all("2010" not in text for text in labels), "year should not be in the series name"
+    assert "Brazil · Secondary completed" in set(labels)
+
+
+def test_grouping_on_an_empty_column_returns_nothing_rather_than_erroring(extract, tmp_path):
+    """A grouping variable a country does not collect yields no rows, not a crash."""
+    df = aggregate(
+        extract,
+        Measure("EDATTAIN", "share", categories=(3,), exclude=(0, 9),
+                subset={"COUNTRY": (999,)}),   # a country that is not in the file
+    )
+    assert df.empty
+
+
+def test_group_by_must_not_be_empty(extract):
+    with pytest.raises(ValueError, match="at least one column"):
+        aggregate(extract, Measure("EDATTAIN", "mean"), group_by=())
+
+
+def test_unknown_group_column_is_reported(extract):
+    with pytest.raises(KeyError, match="GEOLEV1"):
+        aggregate(extract, Measure("EDATTAIN", "mean"), group_by=("COUNTRY", "GEOLEV1"))

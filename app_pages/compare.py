@@ -3,15 +3,23 @@ import pandas as pd
 import streamlit as st
 
 from app_shared import catalog, scatter_chart, sticky
-from ipumsi.microdata import Measure, add_iso3, aggregate, find_extracts
+from ipumsi.microdata import (
+    DEFAULT_GROUP_BY,
+    Measure,
+    add_iso3,
+    aggregate,
+    find_extracts,
+    group_label,
+)
 from ipumsi.worldbank import DEFAULT_INDICATOR, INDICATORS, attach, indicator_label
 
 cat = catalog()
 
 st.write(
-    "Plot a country-level measure from your census microdata against a World Bank "
-    "indicator, or against a second measure. Everything is computed at the "
-    "**country × year** level from a downloaded extract, weighted by `PERWT`."
+    "Plot a weighted measure from your census microdata against a World Bank "
+    "indicator, or against a second measure. The unit of analysis is yours to "
+    "choose — country × year by default, or finer (regions within a country, "
+    "urban vs rural, and so on)."
 )
 
 extracts = find_extracts()
@@ -39,6 +47,48 @@ weights = [c for c in ("PERWT", "HHWT") if c in chosen.columns] or ["PERWT"]
 if not analysable:
     st.warning("This extract has only technical variables — nothing to aggregate.")
     st.stop()
+
+st.subheader("Unit of analysis")
+st.caption(
+    "By default each point is a country in a census year. Add a grouping "
+    "variable to go finer — `GEOLEV1` gives regions within a country, and any "
+    "categorical variable in the extract works."
+)
+
+# Weights and row identifiers cannot group; anything with value labels can.
+NOT_GROUPABLE = {"PERWT", "HHWT", "SERIAL", "PERNUM"}
+groupable = [
+    c
+    for c in chosen.columns
+    if c not in NOT_GROUPABLE
+    and c not in ("COUNTRY", "YEAR")
+    and (chosen.labels_for(c) or c.startswith("GEO"))
+]
+
+with st.container(horizontal=True):
+    extra_groups = sticky(
+        "multiselect", "Group by (on top of country × year)", "cmp_groups",
+        options=groupable, default=[],
+        format_func=lambda v: f"{v} — {chosen.label_of(v)}"[:70],
+        help="Leave empty for a country panel. GEOLEV1 = first subnational unit.",
+    )
+    country_labels = chosen.labels_for("COUNTRY")
+    country_names = sorted(country_labels.values())
+    only_countries = sticky(
+        "multiselect", "Restrict to countries", "cmp_countries",
+        options=country_names, default=[],
+        placeholder="All countries in the extract",
+        help="Usually what you want when grouping by region.",
+    )
+
+group_by = tuple(DEFAULT_GROUP_BY) + tuple(extra_groups)
+name_to_code = {v: k for k, v in country_labels.items()}
+country_subset = tuple(name_to_code[n] for n in only_countries if n in name_to_code)
+if extra_groups and not only_countries:
+    st.caption(
+        "Grouping finer than country without restricting countries can produce a "
+        "great many points — pick one or two countries above."
+    )
 
 
 def measure_controls(prefix: str, default_variable: str) -> Measure | None:
@@ -106,25 +156,30 @@ def measure_controls(prefix: str, default_variable: str) -> Measure | None:
         exclude=exclude,
         weight=weight,
         filters=filters,
+        subset={"COUNTRY": country_subset} if country_subset else {},
     )
 
 
 @st.cache_data(show_spinner=False, max_entries=16)
-def _aggregate(number: int, spec: tuple) -> pd.DataFrame:
-    """Cached country-year aggregate. `spec` is the Measure, made hashable."""
+def _aggregate(number: int, spec: tuple, groups: tuple) -> pd.DataFrame:
+    """Cached aggregate. `spec` is the Measure, flattened so it can be hashed."""
     extract = next(e for e in find_extracts() if e.number == number)
-    variable, kind, categories, exclude, weight, filters = spec
+    variable, kind, categories, exclude, weight, filters, subset = spec
     measure = Measure(
         variable=variable, kind=kind, categories=categories, exclude=exclude,
-        weight=weight, filters=dict(filters),
+        weight=weight, filters=dict(filters), subset=dict(subset),
     )
-    return add_iso3(aggregate(extract, measure), cat)
+    frame = aggregate(extract, measure, group_by=groups)
+    if not frame.empty and "COUNTRY" in groups:
+        frame = add_iso3(frame, cat)
+    return frame
 
 
 def spec_of(measure: Measure) -> tuple:
     return (
         measure.variable, measure.kind, measure.categories, measure.exclude,
         measure.weight, tuple(sorted(measure.filters.items())),
+        tuple(sorted((k, tuple(v)) for k, v in measure.subset.items())),
     )
 
 
@@ -136,9 +191,16 @@ def run(measure: Measure) -> pd.DataFrame:
         "minute or two the first time, then it is cached."
     )
     try:
-        result = _aggregate(chosen.number, key)
+        result = _aggregate(chosen.number, key, group_by)
     finally:
         bar.empty()
+    if result.empty:
+        st.warning(
+            f"**{measure.variable}** has no data for this selection. That usually "
+            "means the variable is empty for the chosen countries, or the grouping "
+            "variable is not collected there."
+        )
+        st.stop()
     return result
 
 
@@ -180,11 +242,15 @@ y_label = y_measure.describe(chosen)
 if indicator:
     data = attach(data, indicator, column="x")
     x_label = indicator_label(indicator)
+    if extra_groups:
+        st.caption(
+            "The World Bank series is national, so every group inside a "
+            "country-year shares its value — the x position repeats across them."
+        )
 else:
     other = run(x_measure).rename(columns={"value": "x", "n": "n_x"})
-    data = data.merge(
-        other[["country", "year", "x", "n_x"]], on=["country", "year"], how="inner"
-    )
+    keys = list(group_by)
+    data = data.merge(other[keys + ["x", "n_x"]], on=keys, how="inner")
     x_label = x_measure.describe(chosen)
 
 before = len(data)
@@ -207,9 +273,11 @@ else:
     data["x_plot"] = data["x"]
     x_axis_label = x_label
 
+data["group"] = group_label(data, group_by)
+
 with st.container(horizontal=True):
-    st.metric("Country-years plotted", len(data))
-    st.metric("Countries", data["country"].nunique())
+    st.metric("Points plotted", len(data))
+    st.metric("Series", data["group"].nunique())
     correlation = np.corrcoef(data["x_plot"], data["y"])[0, 1]
     st.metric("Correlation", f"{correlation:.3f}")
 if dropped:
@@ -218,19 +286,19 @@ if dropped:
 st.subheader("Display")
 with st.container(horizontal=True):
     show_fit = sticky("checkbox", "Linear fit", "cmp_fit", default=True)
-    colour_by_country = sticky("checkbox", "Colour by country", "cmp_colour", default=True)
-    countries = sorted(data["country"].unique())
+    colour_by_group = sticky("checkbox", "Colour by series", "cmp_colour", default=True)
+    series = sorted(data["group"].unique())
     highlight = sticky(
         "selectbox", "Highlight one", "cmp_highlight",
-        options=["(none)"] + countries, default="(none)",
-        help="Greys out the rest — the reliable way to trace a single country.",
+        options=["(none)"] + series, default="(none)",
+        help="Greys out the rest — the reliable way to trace a single series.",
     )
 highlight = None if highlight == "(none)" else highlight
 
-if colour_by_country and len(countries) > 3:
+if colour_by_group and len(series) > 3:
     st.caption(
-        f"{len(countries)} countries share the palette, so some colours sit close "
-        "together. Each country also has its own marker shape, and 'Highlight one' "
+        f"{len(series)} series share the palette, so some colours sit close "
+        "together. Each also has its own marker shape, and 'Highlight one' "
         "isolates a single series when the distinction matters."
     )
 
@@ -270,7 +338,8 @@ st.altair_chart(
     scatter_chart(
         data, x_axis_label, y_label,
         show_fit=show_fit,
-        colour_by_country=colour_by_country,
+        colour_by_group=colour_by_group,
+        legend_title=" × ".join(g for g in group_by if g != "YEAR"),
         x_domain=x_domain,
         y_domain=y_domain,
         highlight=highlight,
@@ -282,9 +351,12 @@ st.caption(
     "count behind each estimate — small points rest on few observations."
 )
 
-table = data[["country", "iso3", "year", "y", "x", "n_y", "weighted_n"]].sort_values(
-    ["country", "year"]
-)
+table_columns = [
+    c for c in ["group", "country", "iso3", "year", *group_by,
+                "y", "x", "n_y", "weighted_n"]
+    if c in data.columns
+]
+table = data[list(dict.fromkeys(table_columns))].sort_values(["group", "year"])
 with st.expander("The underlying country-year table"):
     st.dataframe(
         table,

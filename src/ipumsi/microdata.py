@@ -124,9 +124,15 @@ def _header(path: Path) -> list[str]:
     return [c.strip().strip('"') for c in line.rstrip("\n").split(",")]
 
 
+#: The default unit of analysis. Anything in the extract can be added -- group by
+#: ``("COUNTRY", "YEAR", "GEOLEV1")`` for regions within countries, or replace it
+#: entirely to compare, say, urban against rural.
+DEFAULT_GROUP_BY: tuple[str, ...] = ("COUNTRY", "YEAR")
+
+
 @dataclass
 class Measure:
-    """What to compute per country-year."""
+    """What to compute per group."""
 
     variable: str
     kind: str = "share"                       # "share" | "mean"
@@ -134,6 +140,7 @@ class Measure:
     exclude: tuple[int, ...] = ()             # codes dropped from the denominator
     weight: str = "PERWT"
     filters: dict[str, tuple[float, float]] = field(default_factory=dict)
+    subset: dict[str, tuple[float, ...]] = field(default_factory=dict)
 
     def describe(self, extract: Extract) -> str:
         labels = extract.labels_for(self.variable)
@@ -152,17 +159,30 @@ class Measure:
 def aggregate(
     extract: Extract,
     measure: Measure,
+    group_by: tuple[str, ...] | list[str] = DEFAULT_GROUP_BY,
     chunksize: int = CHUNK_ROWS,
     on_progress=None,
 ) -> pd.DataFrame:
-    """Country x year weighted measure, computed by streaming the extract.
+    """Weighted measure per group, computed by streaming the extract.
 
-    Returns one row per ``(COUNTRY, YEAR)`` with the weighted value, the weighted
-    denominator, and the unweighted case count behind it.
+    ``group_by`` is the unit of analysis: ``("COUNTRY", "YEAR")`` for the usual
+    country panel, ``("COUNTRY", "YEAR", "GEOLEV1")`` for regions within
+    countries, or anything else the extract carries.
+
+    Returns one row per group with the weighted value, the weighted denominator,
+    and the unweighted case count behind it. Group columns that have value labels
+    in the codebook also get a ``<COLUMN>_label`` column.
     """
+    group_by = tuple(c.upper() for c in group_by)
+    if not group_by:
+        raise ValueError("group_by needs at least one column")
+
     columns = set(extract.columns)
-    needed = {"COUNTRY", "YEAR", measure.variable.upper(), measure.weight.upper()}
+    variable = measure.variable.upper()
+    weight = measure.weight.upper()
+    needed = {variable, weight, *group_by}
     needed |= {k.upper() for k in measure.filters}
+    needed |= {k.upper() for k in measure.subset}
     missing = sorted(needed - columns)
     if missing:
         raise KeyError(
@@ -170,17 +190,14 @@ def aggregate(
             f"It contains: {', '.join(sorted(columns))}"
         )
 
-    variable = measure.variable.upper()
-    weight = measure.weight.upper()
-    usecols = sorted(needed)
-    numerator: dict[tuple[int, int], float] = {}
-    denominator: dict[tuple[int, int], float] = {}
-    counts: dict[tuple[int, int], int] = {}
+    numerator: dict[tuple, float] = {}
+    denominator: dict[tuple, float] = {}
+    counts: dict[tuple, int] = {}
     rows_seen = 0
 
     reader = pd.read_csv(
         extract.data_path,
-        usecols=usecols,
+        usecols=sorted(needed),
         chunksize=chunksize,
         dtype="float64",
         na_values=[""],
@@ -191,9 +208,11 @@ def aggregate(
         for column, (low, high) in measure.filters.items():
             series = chunk[column.upper()]
             chunk = chunk[(series >= low) & (series <= high)]
+        for column, values in measure.subset.items():
+            chunk = chunk[chunk[column.upper()].isin(values)]
         if measure.exclude:
             chunk = chunk[~chunk[variable].isin(measure.exclude)]
-        chunk = chunk.dropna(subset=[variable, weight])
+        chunk = chunk.dropna(subset=[variable, weight, *group_by])
         if chunk.empty:
             continue
 
@@ -204,9 +223,11 @@ def aggregate(
             hit = chunk[variable].isin(measure.categories).to_numpy()
             contribution = np.where(hit, w, 0.0)
 
-        keys = list(zip(chunk["COUNTRY"].astype("int64"), chunk["YEAR"].astype("int64")))
+        keys = list(zip(*(chunk[c].astype("int64") for c in group_by)))
         frame = pd.DataFrame({"key": keys, "num": contribution, "den": w})
-        grouped = frame.groupby("key").agg(num=("num", "sum"), den=("den", "sum"), n=("den", "size"))
+        grouped = frame.groupby("key").agg(
+            num=("num", "sum"), den=("den", "sum"), n=("den", "size")
+        )
         for key, row in grouped.iterrows():
             numerator[key] = numerator.get(key, 0.0) + row["num"]
             denominator[key] = denominator.get(key, 0.0) + row["den"]
@@ -216,24 +237,59 @@ def aggregate(
             on_progress(rows_seen)
 
     records = []
-    country_labels = extract.labels_for("COUNTRY")
-    for (country_code, year), den in denominator.items():
+    for key, den in denominator.items():
         if den <= 0:
             continue
-        records.append(
-            {
-                "country_code": country_code,
-                "country": country_labels.get(country_code, str(country_code)),
-                "year": year,
-                "value": numerator[(country_code, year)] / den,
-                "weighted_n": den,
-                "n": counts[(country_code, year)],
-            }
-        )
+        record = dict(zip(group_by, key))
+        record["value"] = numerator[key] / den
+        record["weighted_n"] = den
+        record["n"] = counts[key]
+        records.append(record)
 
-    result = pd.DataFrame(records).sort_values(["country", "year"]).reset_index(drop=True)
-    log.info("%s: %d country-years from %d rows", measure.variable, len(result), rows_seen)
+    result = pd.DataFrame(records, columns=[*group_by, "value", "weighted_n", "n"])
+    if result.empty:
+        log.warning("%s: no rows survived the filters", measure.variable)
+        return result
+
+    # Human-readable names for whichever group columns the codebook labels.
+    for column in group_by:
+        labels = extract.labels_for(column)
+        if labels:
+            result[f"{column}_label"] = result[column].map(
+                lambda code, _l=labels: _l.get(code, str(code))
+            )
+
+    # `country` and `year` are the join keys for ISO3 and World Bank data, so
+    # surface them under those names when they are part of the grouping.
+    if "COUNTRY" in group_by:
+        result["country"] = result.get("COUNTRY_label", result["COUNTRY"].astype(str))
+        result["country_code"] = result["COUNTRY"]
+    if "YEAR" in group_by:
+        result["year"] = result["YEAR"]
+
+    result = result.sort_values(list(group_by)).reset_index(drop=True)
+    log.info(
+        "%s: %d group(s) over %s from %d rows",
+        measure.variable, len(result), "×".join(group_by), rows_seen,
+    )
     return result
+
+
+def group_label(frame: pd.DataFrame, group_by: tuple[str, ...] | list[str]) -> pd.Series:
+    """A readable name per row, for colouring and labelling a chart."""
+    group_by = [c.upper() for c in group_by]
+    parts = []
+    for column in group_by:
+        if column == "YEAR":  # the year is already an axis or a tooltip field
+            continue
+        source = f"{column}_label" if f"{column}_label" in frame.columns else column
+        parts.append(frame[source].astype(str))
+    if not parts:
+        return frame.get("YEAR", pd.Series("all", index=frame.index)).astype(str)
+    combined = parts[0]
+    for part in parts[1:]:
+        combined = combined + " · " + part
+    return combined
 
 
 def add_iso3(frame: pd.DataFrame, catalog) -> pd.DataFrame:
